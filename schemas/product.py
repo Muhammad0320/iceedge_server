@@ -43,6 +43,7 @@ class Customer(Base):
     role: Mapped[Role] = mapped_column(Enum(Role), default=Role.CUSTOMER) 
     shipping_address: Mapped[str] = mapped_column(Text, nullable=False) 
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now) 
+    orders: Mapped[List["Order"]] = relationship("Order", cascade='all, delete')
     
 
 class Review(Base): 
@@ -63,7 +64,9 @@ class Order(Base):
     shipping_fee: Mapped[float] = mapped_column(Float, nullable=False) 
     shipping_address: Mapped[float] = mapped_column(Float, nullable=True) 
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now) 
-
+    customer_id: Mapped[int] = mapped_column(ForeignKey('customer.id'), nullable=False) 
+    customer: Mapped["Customer"] = relationship("Customer", back_populates="orders") 
+    
 class Cart(Base): 
     __tablename__= "cart"
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True) 
