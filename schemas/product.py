@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Mapped, mapped_column, DeclarativeBase
 from sqlalchemy import DateTime, String, Text, Integer, Float, JSON, Enum 
-
+from datetime import datetime
 class Base(DeclarativeBase):
     pass 
 
@@ -21,6 +21,7 @@ class Product(Base):
     amt_left: Mapped[int] = mapped_column(Integer, nullable=False)  
     avg_rating: Mapped[float] = mapped_column(Float, default=0) 
     ratings_count: Mapped[int] = mapped_column(Float, default=0) 
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now) 
     
     
 class Customer(Base): 
@@ -32,8 +33,12 @@ class Customer(Base):
     password: Mapped[str] = mapped_column(String(255), nullable=False) 
     role: Mapped[Role] = mapped_column(Enum(Role), default=Role.CUSTOMER) 
     shipping_address: Mapped[str] = mapped_column(Text, nullable=False) 
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now) 
+    
 
 class Review(Base): 
     __tablename__ = 'review'
-    
-    
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True) 
+    content: Mapped[str] = mapped_column(Text, nullable=False)     
+    rating: Mapped[float] = mapped_column(Float, nullable=False, max=5.0, min=1.0) 
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now) 
