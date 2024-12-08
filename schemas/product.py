@@ -9,6 +9,13 @@ class Role(Enum):
     CUSTOMER = 'customer' 
     DEVELOPER = 'developer'
 
+class Category(Enum): 
+    SHIIRT = "shirt"
+    PANT = 'pant'
+    CAP = 'cap'
+    SHOE = 'shoe'
+    SOCK = 'sock'
+
 class Product(Base): 
     __tablename__='product'
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
@@ -57,3 +64,7 @@ class Cart(Base):
     total: Mapped[float] = mapped_column(Float, nullable=False) 
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now) 
 
+class Category(Base): 
+    __tablename__="category"
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True) 
+    name: 
