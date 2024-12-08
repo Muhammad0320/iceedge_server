@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Mapped, mapped_column, DeclarativeBase
-from sqlalchemy import DateTime, String, Text, Integer, Float, JSON, Enum 
+from sqlalchemy import DateTime, String, Text, Integer, Float, JSON, Enum, ForeignKey
 from datetime import datetime
 class Base(DeclarativeBase):
     pass 
@@ -51,20 +51,27 @@ class Review(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now) 
 
 class Order(Base): 
-    __tablename__="order"
+    __tablename__= "order"
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True) 
     total: Mapped[float] = mapped_column(Integer, nullable=False) 
+    quantity: Mapped[int] = mapped_column(Integer, default=1) 
     shipping_fee: Mapped[float] = mapped_column(Float, nullable=False) 
     shipping_address: Mapped[float] = mapped_column(Float, nullable=True) 
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now) 
 
 class Cart(Base): 
-    __tablename__="cart"
+    __tablename__= "cart"
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True) 
     total: Mapped[float] = mapped_column(Float, nullable=False) 
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now) 
 
 class Category(Base): 
-    __tablename__="category"
+    __tablename__= "category"
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True) 
     name: Mapped[Cat] = mapped_column(Enum(Cat), nullable=False) 
+
+class Item(Base): 
+    __tablename__= "item"
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True) 
+    total: Mapped[float] = mapped_column(Float, nullable=False ) 
+    quantity: Mapped[int] = mapped_column(Integer, default=1) 
