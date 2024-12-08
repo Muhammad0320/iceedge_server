@@ -33,7 +33,7 @@ class Product(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now) 
     reviews: Mapped[List["Review"]] = relationship("Review", cascade='all, delete') 
     
-    
+
 class Customer(Base): 
     __tablename__='customer'
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True) 
@@ -67,6 +67,7 @@ class Order(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now) 
     customer_id: Mapped[int] = mapped_column(ForeignKey('customer.id'), nullable=False) 
     customer: Mapped["Customer"] = relationship("Customer", back_populates="orders") 
+    order_items: Mapped[List['Item']] = relationship("Item") 
     
 class Cart(Base): 
     __tablename__= "cart"
@@ -87,3 +88,4 @@ class Item(Base):
     quantity: Mapped[int] = mapped_column(Integer, default=1) 
     product_id: Mapped[int] = mapped_column(ForeignKey('product.id'), nullable=False) 
     product: Mapped[Product] = relationship("Product") 
+    order_id: Mapped[int] = mapped_column(ForeignKey('order.id'), nullable=True)
