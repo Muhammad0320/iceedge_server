@@ -42,3 +42,12 @@ class Review(Base):
     content: Mapped[str] = mapped_column(Text, nullable=False)     
     rating: Mapped[float] = mapped_column(Float, nullable=False, max=5.0, min=1.0) 
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now) 
+
+class Order(Base): 
+    __tablename__="order"
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True) 
+    total: Mapped[float] = mapped_column(Integer, nullable=False) 
+    shipping_fee: Mapped[float] = mapped_column(Float, nullable=False) 
+    shipping_address: Mapped[float] = mapped_column(Float, nullable=True) 
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now) 
+
