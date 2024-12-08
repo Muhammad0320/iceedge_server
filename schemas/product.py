@@ -1,6 +1,7 @@
-from sqlalchemy.orm import Mapped, mapped_column, DeclarativeBase
+from sqlalchemy.orm import Mapped, mapped_column, DeclarativeBase, relationship
 from sqlalchemy import DateTime, String, Text, Integer, Float, JSON, Enum, ForeignKey
 from datetime import datetime
+from typing import List
 class Base(DeclarativeBase):
     pass 
 
@@ -29,6 +30,7 @@ class Product(Base):
     avg_rating: Mapped[float] = mapped_column(Float, default=0) 
     ratings_count: Mapped[int] = mapped_column(Float, default=0) 
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now) 
+    reviews: Mapped[List["Review"]] = relationship("Review", cascade='all, delete') 
     
     
 class Customer(Base): 
@@ -49,6 +51,9 @@ class Review(Base):
     content: Mapped[str] = mapped_column(Text, nullable=False)     
     rating: Mapped[float] = mapped_column(Float, nullable=False, max=5.0, min=1.0) 
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now) 
+    product_id: Mapped[int] = mapped_column(ForeignKey('product.id'), nullable=False) 
+    product: Mapped["Product"] = relationship("Product", back_populates='reviews' ) 
+     
 
 class Order(Base): 
     __tablename__= "order"
