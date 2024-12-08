@@ -9,7 +9,7 @@ class Role(Enum):
     CUSTOMER = 'customer' 
     DEVELOPER = 'developer'
 
-class Category(Enum): 
+class Cat(Enum): 
     SHIIRT = "shirt"
     PANT = 'pant'
     CAP = 'cap'
@@ -67,4 +67,4 @@ class Cart(Base):
 class Category(Base): 
     __tablename__="category"
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True) 
-    name: 
+    name: Mapped[Cat] = mapped_column(Enum(Cat), nullable=False) 
