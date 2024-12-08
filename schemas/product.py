@@ -71,6 +71,7 @@ class Cart(Base):
     __tablename__= "cart"
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True) 
     total: Mapped[float] = mapped_column(Float, nullable=False) 
+    
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now) 
 
 class Category(Base): 
@@ -83,3 +84,5 @@ class Item(Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True) 
     total: Mapped[float] = mapped_column(Float, nullable=False ) 
     quantity: Mapped[int] = mapped_column(Integer, default=1) 
+    product_id: Mapped[int] = mapped_column(ForeignKey('product.id'), nullable=False) 
+    product: Mapped[Product] = relationship("Product") 
