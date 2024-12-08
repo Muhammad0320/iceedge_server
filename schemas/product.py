@@ -24,6 +24,7 @@ class Product(Base):
     discount: Mapped[float] = mapped_column(Float, default=0) 
     name: Mapped[str] = mapped_column(String(255), nullable=False) 
     description: Mapped[str] = mapped_column(Text, nullable=False) 
+    cat_id: Mapped[int] = mapped_column(ForeignKey('category.id'), nullable=False)
     thumbnail: Mapped[str] = mapped_column(String(255), nullable=False)
     gallery: Mapped[list[str]] = mapped_column(JSON, nullable=False) 
     amt_left: Mapped[int] = mapped_column(Integer, nullable=False)  
