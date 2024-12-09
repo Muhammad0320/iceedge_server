@@ -2,6 +2,11 @@ from pydantic import BaseModel, EmailStr, model_validator, Field
 from datetime import datetime
 from enum import Enum 
 
+class Role(str, Enum): 
+    ADMIN = 'admin'
+    CUSTOMER = 'customer' 
+    DEVELOPER = 'developer'
+
 class Cat(str, Enum): 
     SHIIRT = "shirt"
     PANT = 'pant'
@@ -41,3 +46,12 @@ class ProductUpdate(BaseModel):
     amt_left: int = Field(None, ge=1) 
     avg_rating: float = Field(None, ge=1.0, le=5.0)
     ratings_count: int = Field(None, ge=0)
+
+class CustomerBase(BaseModel): 
+    firstname: str 
+    lastname: str 
+    email: EmailStr 
+    password: str = Field(..., min_length=8) 
+    password_confirm: str 
+    role
+    
