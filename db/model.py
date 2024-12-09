@@ -111,3 +111,15 @@ class OrderUpdate(BaseModel):
     shipping_fee: float = Field(None)
     shipping_address: str = Field(None)
 
+class CategoryBase(BaseModel): 
+    name: Cat 
+
+class CategoryCreate(CategoryBase): 
+    pass 
+
+class CategoryRead(CategoryBase): 
+    id: int 
+
+class CategoryUpdate(BaseModel): 
+    name: Cat = Field(None)
+
