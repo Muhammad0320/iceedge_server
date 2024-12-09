@@ -1,6 +1,7 @@
 from pydantic import BaseModel, EmailStr, model_validator, Field
 from datetime import datetime
 from enum import Enum 
+from typing_extensions import Self
 
 class Role(str, Enum): 
     ADMIN = 'admin'
@@ -27,7 +28,7 @@ class ProductBase(BaseModel):
     amt_left: int = Field(..., ge=1) 
     avg_rating: float = Field(0, ge=1.0, le=5.0)
     ratings_count: int = Field(0, ge=0)
-    created_at: datetime
+    created_at: datetime = Field(default_factory=datetime.now)
 
 
 class ProductCreate(ProductBase): 
@@ -47,11 +48,30 @@ class ProductUpdate(BaseModel):
     avg_rating: float = Field(None, ge=1.0, le=5.0)
     ratings_count: int = Field(None, ge=0)
 
-class CustomerBase(BaseModel): 
+class UserBase(BaseModel): 
     firstname: str 
     lastname: str 
     email: EmailStr 
     password: str = Field(..., min_length=8) 
     password_confirm: str 
-    role
-    
+    shipping_address: str 
+    role: Role = Field(default=Role.CUSTOMER)  
+    created_at: datetime = Field(default_factory=datetime.now) 
+
+class UserCreate(UserBase): 
+    @model_validator(mode='after') 
+    def validate_password(self) -> Self:
+        if self.password != self.password_confirm: 
+            raise ValueError("Passwords must match!") 
+        return self
+
+class UserRead(UserBase): 
+    id: int 
+
+class UserUpdate(BaseModel): 
+    firstname: str = Field(None)  
+    lastname: str = Field(None)
+    email: EmailStr = Field(None)
+    password: str = Field(None, min_length=8) 
+    password_confirm: str = Field(None)
+    shipping_address: str = Field(None)
