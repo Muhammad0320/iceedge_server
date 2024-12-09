@@ -123,3 +123,17 @@ class CategoryRead(CategoryBase):
 class CategoryUpdate(BaseModel): 
     name: Cat = Field(None)
 
+
+class ItemBase(BaseModel): 
+    total: float = Field(..., ge=4999.99) 
+    quantity: int = Field(..., gt=1) 
+
+class ItemCreate(ItemBase): 
+    pass
+
+class ItemRead(ItemBase): 
+    id: int 
+
+class ItemUpdate(BaseModel): 
+    total: float = Field( None, ge=4999.99) 
+    quantity: int = Field (None,  gt=1) 
