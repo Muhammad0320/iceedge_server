@@ -91,3 +91,23 @@ class ReviewUpdate(BaseModel):
     content: str = Field(None)
     rating: float = Field(None, ge=1.0, le=5.0)
 
+class OrderBase(BaseModel): 
+    total: float = Field(..., ge=4999.99) 
+    quantity: int = Field(..., gt=1) 
+    shipping_fee: float 
+    shipping_address: str 
+    created_at: datetime = Field(default_factory=datetime.now) 
+
+
+class OrderCreate(OrderBase): 
+    pass 
+
+class OrderRead(OrderBase): 
+    id: int 
+
+class OrderUpdate(BaseModel): 
+    total: float = Field(None, ge=4999.99) 
+    quantity: int = Field(None, gt=1) 
+    shipping_fee: float = Field(None)
+    shipping_address: str = Field(None)
+
