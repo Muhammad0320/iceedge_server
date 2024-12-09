@@ -30,3 +30,14 @@ class ProductCreate(ProductBase):
 
 class ProductRead(ProductBase): 
     id: int 
+
+class ProductUpdate(BaseModel): 
+    discount: int = Field(None, ge=0, le=99) 
+    name: str = Field(None) 
+    description: str = Field(None) 
+    category: Cat = Field(None) 
+    thumbnail: str = Field(None) 
+    gallery: list[str] = Field(None) 
+    amt_left: int = Field(None, ge=1) 
+    avg_rating: float = Field(None, ge=1.0, le=5.0)
+    ratings_count: int = Field(None, ge=0)
