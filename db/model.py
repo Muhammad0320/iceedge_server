@@ -75,3 +75,19 @@ class UserUpdate(BaseModel):
     password: str = Field(None, min_length=8) 
     password_confirm: str = Field(None)
     shipping_address: str = Field(None)
+
+class ReviewBase(BaseModel): 
+    content: str 
+    rating: float = Field(0, ge=1.0, le=5.0)
+    created_at: datetime = Field(default_factory=datetime.now) 
+
+class ReviewCreate(ReviewBase): 
+    pass 
+
+class ReviewRead(ReviewBase): 
+    id: int 
+
+class ReviewUpdate(BaseModel): 
+    content: str = Field(None)
+    rating: float = Field(None, ge=1.0, le=5.0)
+
