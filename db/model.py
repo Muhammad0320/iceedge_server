@@ -68,7 +68,9 @@ class UserCreate(UserBase):
 
 class UserRead(UserBase): 
     id: int 
-
+    orders: list["OrderRead"] = Field(None) 
+    
+    
 class UserUpdate(BaseModel): 
     firstname: str = Field(None)  
     lastname: str = Field(None)
@@ -99,7 +101,7 @@ class OrderBase(BaseModel):
     shipping_fee: float 
     shipping_address: str 
     created_at: datetime = Field(default_factory=datetime.now) 
-
+    customer_id: int 
 
 class OrderCreate(OrderBase): 
     pass 
