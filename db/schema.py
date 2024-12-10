@@ -22,14 +22,15 @@ class ProductBase(BaseModel):
     discount: int = Field(..., ge=0, le=99) 
     name: str 
     description: str 
-    category: Cat 
+    cat_id: int 
     thumbnail: str 
     gallery: list[str] 
     amt_left: int = Field(..., ge=1) 
     avg_rating: float = Field(0, ge=1.0, le=5.0)
     ratings_count: int = Field(0, ge=0)
     created_at: datetime = Field(default_factory=datetime.now)
-     
+    class Config:
+        orm_mode=True 
 
 class ProductCreate(ProductBase): 
     pass 
@@ -58,7 +59,9 @@ class UserBase(BaseModel):
     shipping_address: str 
     role: Role = Field(default=Role.CUSTOMER)  
     created_at: datetime = Field(default_factory=datetime.now) 
-
+    class Config: 
+        orm_mode=True 
+    
 class UserCreate(UserBase): 
     @model_validator(mode='after') 
     def validate_password(self) -> Self:
@@ -84,7 +87,9 @@ class ReviewBase(BaseModel):
     rating: float = Field(0, ge=1.0, le=5.0)
     created_at: datetime = Field(default_factory=datetime.now) 
     product_id: int 
-    
+    class Config:
+        orm_mode=True 
+
 class ReviewCreate(ReviewBase): 
     pass 
 
@@ -103,6 +108,8 @@ class OrderBase(BaseModel):
     created_at: datetime = Field(default_factory=datetime.now) 
     customer_id: int 
     order_items: list["ItemRead"]
+    class Config:
+        orm_mode=True 
 
 class OrderCreate(OrderBase): 
     pass 
@@ -118,6 +125,8 @@ class OrderUpdate(BaseModel):
 
 class CategoryBase(BaseModel): 
     name: Cat 
+    class Config:
+        orm_mode=True 
 
 class CategoryCreate(CategoryBase): 
     pass 
@@ -134,6 +143,8 @@ class ItemBase(BaseModel):
     quantity: int = Field(..., gt=1) 
     product_id: int 
     order_id: int 
+    class Config:
+        orm_mode=True 
 
 class ItemCreate(ItemBase): 
     pass
