@@ -102,6 +102,7 @@ class OrderBase(BaseModel):
     shipping_address: str 
     created_at: datetime = Field(default_factory=datetime.now) 
     customer_id: int 
+    order_items: list["ItemRead"]
 
 class OrderCreate(OrderBase): 
     pass 
@@ -131,6 +132,8 @@ class CategoryUpdate(BaseModel):
 class ItemBase(BaseModel): 
     total: float = Field(..., ge=4999.99) 
     quantity: int = Field(..., gt=1) 
+    product_id: int 
+    order_id: int 
 
 class ItemCreate(ItemBase): 
     pass

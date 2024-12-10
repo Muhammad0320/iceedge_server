@@ -69,12 +69,12 @@ class Order(Base):
     customer: Mapped["User"] = relationship("User", back_populates="orders") 
     order_items: Mapped[List['Item']] = relationship("Item") 
     
-class Cart(Base): 
-    __tablename__= "carts"
-    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True) 
-    total: Mapped[float] = mapped_column(Float, nullable=False) 
+# class Cart(Base): 
+#     __tablename__= "carts"
+#     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True) 
+#     total: Mapped[float] = mapped_column(Float, nullable=False) 
     
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now) 
+#     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now) 
 
 class Category(Base): 
     __tablename__= "categorys"
