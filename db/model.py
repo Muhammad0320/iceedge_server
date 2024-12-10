@@ -29,13 +29,14 @@ class ProductBase(BaseModel):
     avg_rating: float = Field(0, ge=1.0, le=5.0)
     ratings_count: int = Field(0, ge=0)
     created_at: datetime = Field(default_factory=datetime.now)
-
+     
 
 class ProductCreate(ProductBase): 
     pass 
 
 class ProductRead(ProductBase): 
     id: int 
+    reviews: list["ReviewRead"] = Field(None) 
 
 class ProductUpdate(BaseModel): 
     discount: int = Field(None, ge=0, le=99) 
@@ -80,7 +81,8 @@ class ReviewBase(BaseModel):
     content: str 
     rating: float = Field(0, ge=1.0, le=5.0)
     created_at: datetime = Field(default_factory=datetime.now) 
-
+    product_id: int 
+    
 class ReviewCreate(ReviewBase): 
     pass 
 
