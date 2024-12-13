@@ -18,6 +18,11 @@ class Cat(Enum):
     SHOE = 'shoe'
     SOCK = 'sock'
 
+class OrderStatus(Enum): 
+    DELIVERED='delivered'
+    CANCELLED='cancelled'
+    PENDING='pending'
+
 class Product(Base): 
     __tablename__='products'
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
@@ -38,14 +43,14 @@ class Product(Base):
 class User(Base): 
     __tablename__='users'
     id: Mapped[int] = mapped_column(Integer, primary_key=True) 
-    firstname: Mapped[str] = mapped_column(String(255)) 
+    firstname: Mapped[str] = mapped_column(String(32)) 
+    lastname: Mapped[str] = mapped_column(String(32))  
     role: Mapped[Role] = mapped_column(Enum(Role), default=Role.CUSTOMER) 
-    lastname: Mapped[str] = mapped_column(String(255))  
-    email: Mapped[str] = mapped_column(String(255)) 
+    email: Mapped[str] = mapped_column(String(64)) 
     password: Mapped[str] = mapped_column(String(255)) 
     shipping_address: Mapped[ Optional[str]] = mapped_column(Text) 
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now) 
-    orders: Mapped[ Optional[List["Order"]]] = relationship("Order", cascade='all, delete')
+    orders: Mapped[Optional[List["Order"]]] = relationship("Order", cascade='all, delete')
     
 
 class Review(Base): 
@@ -53,23 +58,26 @@ class Review(Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True) 
     content: Mapped[str] = mapped_column(Text)     
     rating: Mapped[float] = mapped_column(Float, max=5.0, min=1.0) 
+    num_marked_useful: Mapped[int] = mapped_column(Integer, default=0) 
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now) 
     product_id: Mapped[int] = mapped_column(ForeignKey('products.id'), index=True)  
-    product: Mapped["Product"] = relationship("Product", back_populates='reviews' ) 
+    product: Mapped["Product"] = relationship("Product", back_populates='reviews') 
     
 
 class Order(Base): 
     __tablename__= "orders"
-    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True) 
-    total: Mapped[float] = mapped_column(Integer, nullable=False) 
+    id: Mapped[int] = mapped_column(Integer, primary_key=True) 
+    total: Mapped[float] = mapped_column(Integer) 
     quantity: Mapped[int] = mapped_column(Integer, default=1) 
-    shipping_fee: Mapped[float] = mapped_column(Float, nullable=False) 
-    shipping_address: Mapped[float] = mapped_column(Float, nullable=True) 
+    shipping_fee: Mapped[float] = mapped_column(Float) 
+    status: Mapped[OrderStatus] = mapped_column(OrderStatus) 
+    shipping_address: Mapped[Optional[str]] = mapped_column(String(255)) 
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now) 
-    customer_id: Mapped[int] = mapped_column(ForeignKey('user.id'), nullable=False) 
+    customer_id: Mapped[int] = mapped_column(ForeignKey('user.id')) 
     customer: Mapped["User"] = relationship("User", back_populates="orders") 
     order_items: Mapped[List['Item']] = relationship("Item") 
-    
+
+
 # class Cart(Base): 
 #     __tablename__= "carts"
 #     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True) 
@@ -78,15 +86,15 @@ class Order(Base):
 #     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now) 
 
 class Category(Base): 
-    __tablename__= "categorys"
-    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True) 
-    name: Mapped[Cat] = mapped_column(Enum(Cat), nullable=False) 
+    __tablename__= "categories"
+    id: Mapped[int] = mapped_column(Integer, primary_key=True) 
+    name: Mapped[Cat] = mapped_column(Enum(Cat)) 
 
 class Item(Base): 
     __tablename__= "items"
-    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True) 
-    total: Mapped[float] = mapped_column(Float, nullable=False ) 
+    id: Mapped[int] = mapped_column(Integer, primary_key=True) 
+    total: Mapped[float] = mapped_column(Float) 
     quantity: Mapped[int] = mapped_column(Integer, default=1) 
-    product_id: Mapped[int] = mapped_column(ForeignKey('products.id'), nullable=False) 
+    product_id: Mapped[int] = mapped_column(ForeignKey('products.id')) 
     product: Mapped[Product] = relationship("Product") 
-    order_id: Mapped[int] = mapped_column(ForeignKey('order.id'), nullable=True)
+    order_id: Mapped[int] = mapped_column(ForeignKey('order.id'), index=True)
