@@ -38,10 +38,10 @@ class User(Base):
     __tablename__='users'
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True) 
     firstname: Mapped[str] = mapped_column(String(255), nullable=False) 
+    role: Mapped[Role] = mapped_column(Enum(Role), default=Role.CUSTOMER) 
     lastname: Mapped[str] = mapped_column(String(255), nullable=False)  
     email: Mapped[str] = mapped_column(String(255), nullable=False) 
     password: Mapped[str] = mapped_column(String(255), nullable=False) 
-    role: Mapped[Role] = mapped_column(Enum(Role), default=Role.CUSTOMER) 
     shipping_address: Mapped[str] = mapped_column(Text, nullable=False) 
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now) 
     orders: Mapped[List["Order"]] = relationship("Order", cascade='all, delete')

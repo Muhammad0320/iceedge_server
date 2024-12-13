@@ -16,18 +16,18 @@ class Cat(str, Enum):
     SOCK = 'sock'
     MASK = "mask"
 
+class Message: 
+    message: str = "Something went wrong!"
 
 class ProductBase(BaseModel): 
     price: float = Field(..., ge=2999.99) 
     discount: int = Field(..., ge=0, le=99) 
     name: str 
     description: str 
-    cat_id: int 
     thumbnail: str 
+    cat: Cat 
     gallery: list[str] 
     amt_left: int = Field(..., ge=1) 
-    avg_rating: float = Field(0, ge=1.0, le=5.0)
-    ratings_count: int = Field(0, ge=0)
     created_at: datetime = Field(default_factory=datetime.now)
     class Config:
         orm_mode=True 
@@ -36,7 +36,9 @@ class ProductCreate(ProductBase):
     pass 
 
 class ProductRead(ProductBase): 
-    id: int 
+    id: int  
+    avg_rating: float = Field(0, ge=1.0, le=5.0)
+    ratings_count: int = Field(0, ge=0)
     reviews: list["ReviewRead"] = Field(None) 
 
 class ProductUpdate(BaseModel): 
@@ -57,7 +59,6 @@ class UserBase(BaseModel):
     password: str = Field(..., min_length=8) 
     password_confirm: str 
     shipping_address: str 
-    role: Role = Field(default=Role.CUSTOMER)  
     created_at: datetime = Field(default_factory=datetime.now) 
     class Config: 
         orm_mode=True 
@@ -71,6 +72,7 @@ class UserCreate(UserBase):
 
 class UserRead(UserBase): 
     id: int 
+    role: Role = Field(default=Role.CUSTOMER)  
     orders: list["OrderRead"] = Field(None) 
     
     
