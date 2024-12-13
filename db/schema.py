@@ -19,6 +19,11 @@ class Cat(str, Enum):
 class Message: 
     message: str = "Something went wrong!"
 
+class OrderStatus(str, Enum): 
+    DELIVERED='delivered'
+    CANCELLED='cancelled'
+    PENDING='pending'
+
 class ProductBase(BaseModel): 
     price: float = Field(..., ge=2999.99) 
     discount: int = Field(..., ge=0, le=99) 
@@ -109,6 +114,7 @@ class OrderBase(BaseModel):
     shipping_address: str 
     created_at: datetime = Field(default_factory=datetime.now) 
     customer_id: int 
+    order_status: OrderStatus = Field(OrderStatus.PENDING)  
     order_items: list["ItemRead"]
     class Config:
         orm_mode=True 
