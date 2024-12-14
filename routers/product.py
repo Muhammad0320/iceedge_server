@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, status, HTTPException, Body, Query, Path
-from sqlalchemy import select, update, delete
+from sqlalchemy import select, update, delete, func
 from ..db.model import Category, Product
 from ..db.schema import ProductCreate, ProductRead, ProductUpdate, Message, Cat
 from datetime import datetime
@@ -52,6 +52,11 @@ async def get_product_by_id(product: Product = Depends(get_product_or_404)):
 async def get_products_by_category(cat: Cat = Query(example=Cat.SHIIRT)): 
     products = await get_prods_by_cat(cat=cat)
     return products
+
+@router.get('/group_by_cat')
+async def get_products_group_by_cat(session: AsyncSession = Depends(get_async_session)): 
+    q = select(Product, func.count() ).group_by('Product.cat')
+    return (await session.scalars(q)).all() 
 
 #TODO: For admins and merchants only
 @router.patch('/{id}' , status_code=status.HTTP_200_OK)
