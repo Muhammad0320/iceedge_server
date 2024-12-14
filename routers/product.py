@@ -17,14 +17,15 @@ async def get_prods_by_cat(cat: Cat, session: AsyncSession = Depends(get_async_s
     q = select(Product).where(Product.cat_id == cat_id).order_by(Product.name)
     return (await session.scalars(q)).all() 
 
-async def check_product_or_404(id: int, session: AsyncSession = Depends(get_async_session)): 
+async def check_product_or_404(id: int, session: AsyncSession = Depends(get_async_session)) -> Product : 
     q = select(Product).where(Product.id == id)
     res = (await session.execute(q)).scalar_one_or_none() 
     if not res: 
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Product not found") 
+    return res
     
 async def get_products(skip: int = Query(0), limit: int = Query(None, max=100, min=1), session: AsyncSession = Depends(get_async_session)):
-    q = select(Product).order_by(Product.created_at)
+    q = select(Product).order_by(Product.created_at).offset(skip).limit(limit)
     return (await session.scalars(q)).all() 
 
 @router.post('/', status_code=status.HTTP_201_CREATED,  response_model=ProductRead,responses={ status.HTTP_409_CONFLICT: {"model": Message()} }, 

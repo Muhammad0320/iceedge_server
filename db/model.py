@@ -28,7 +28,7 @@ class Product(Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     price: Mapped[float] = mapped_column(Float) 
     discount: Mapped[float] = mapped_column(Floatdefault=0) 
-    name: Mapped[str] = mapped_column(String(255)) 
+    name: Mapped[str] = mapped_column(String(255), unique=True)  
     description: Mapped[str] = mapped_column(Text) 
     cat_id: Mapped[int] = mapped_column(ForeignKey('category.id'), index=True) 
     thumbnail: Mapped[str] = mapped_column(String(255))
@@ -46,7 +46,7 @@ class User(Base):
     firstname: Mapped[str] = mapped_column(String(32)) 
     lastname: Mapped[str] = mapped_column(String(32))  
     role: Mapped[Role] = mapped_column(Enum(Role), default=Role.CUSTOMER) 
-    email: Mapped[str] = mapped_column(String(64)) 
+    email: Mapped[str] = mapped_column(String(64), unique=True)  
     password: Mapped[str] = mapped_column(String(255)) 
     shipping_address: Mapped[ Optional[str]] = mapped_column(Text) 
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now) 
@@ -88,7 +88,7 @@ class Order(Base):
 class Category(Base): 
     __tablename__= "categories"
     id: Mapped[int] = mapped_column(Integer, primary_key=True) 
-    name: Mapped[Cat] = mapped_column(Enum(Cat)) 
+    name: Mapped[Cat] = mapped_column(Enum(Cat), unique=True, index=True) 
 
 class Item(Base): 
     __tablename__= "items"
