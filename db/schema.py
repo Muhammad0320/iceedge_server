@@ -44,19 +44,19 @@ class ProductRead(ProductBase):
     id: int  
     avg_rating: float = Field(0, ge=1.0, le=5.0)
     ratings_count: int = Field(0, ge=0)
-    reviews: list["ReviewRead"] = Field(None) 
+    reviews: list["ReviewRead"] | None = Field(None) 
 
 class ProductUpdate(BaseModel): 
-    discount: int = Field(None, ge=0, le=99) 
-    name: str = Field(None) 
-    price: float = Field(None) 
-    description: str = Field(None) 
-    category: Cat = Field(None) 
-    thumbnail: str = Field(None) 
-    gallery: list[str] = Field(None) 
-    amt_left: int = Field(None, ge=1) 
-    avg_rating: float = Field(None, ge=1.0, le=5.0)
-    ratings_count: int = Field(None, ge=0)
+    discount:  int | None = Field(None, ge=0, le=99) 
+    name:  str | None = Field(None) 
+    price:  float | None = Field(None) 
+    description:  str | None = Field(None) 
+    category:  Cat | None = Field(None) 
+    thumbnail:  str | None = Field(None) 
+    gallery: list[str | None] = Field(None) 
+    amt_left:  int | None = Field(None, ge=1) 
+    avg_rating:  float | None = Field(None, ge=1.0, le=5.0)
+    ratings_count:  int | None = Field(None, ge=0)
 
 class UserBase(BaseModel): 
     firstname: str 
@@ -79,16 +79,16 @@ class UserCreate(UserBase):
 class UserRead(UserBase): 
     id: int 
     role: Role = Field(default=Role.CUSTOMER)  
-    orders: list["OrderRead"] = Field(None) 
+    orders: list["OrderRead"] | None = Field(None) 
     
     
 class UserUpdate(BaseModel): 
-    firstname: str = Field(None)  
-    lastname: str = Field(None)
-    email: EmailStr = Field(None)
-    password: str = Field(None, min_length=8) 
-    password_confirm: str = Field(None)
-    shipping_address: str = Field(None)
+    firstname: str | None = Field(None)  
+    lastname: str | None = Field(None)
+    email: EmailStr | None = Field(None)
+    password: str | None = Field(None, min_length=8) 
+    password_confirm: str | None = Field(None)
+    shipping_address: str | None = Field(None)
 
 class ReviewBase(BaseModel): 
     content: str 
@@ -105,8 +105,8 @@ class ReviewRead(ReviewBase):
     id: int 
 
 class ReviewUpdate(BaseModel): 
-    content: str = Field(None)
-    rating: float = Field(None, ge=1.0, le=5.0)
+    content: str | None = Field(None)
+    rating: float | None = Field(None, ge=1.0, le=5.0)
 
 class OrderBase(BaseModel): 
     total: float = Field(..., ge=4999.99) 
@@ -127,10 +127,10 @@ class OrderRead(OrderBase):
     id: int 
 
 class OrderUpdate(BaseModel): 
-    total: float = Field(None, ge=4999.99) 
-    quantity: int = Field(None, gt=1) 
-    shipping_fee: float = Field(None)
-    shipping_address: str = Field(None)
+    total: float | None = Field(None, ge=4999.99) 
+    quantity: int | None = Field(None, gt=1) 
+    shipping_fee: float | None = Field(None)
+    shipping_address: str | None = Field(None)
 
 class CategoryBase(BaseModel): 
     name: Cat 
@@ -144,7 +144,7 @@ class CategoryRead(CategoryBase):
     id: int 
 
 class CategoryUpdate(BaseModel): 
-    name: Cat = Field(None)
+    name: Cat | None = Field(None)
 
 
 class ItemBase(BaseModel): 
@@ -162,5 +162,5 @@ class ItemRead(ItemBase):
     id: int 
 
 class ItemUpdate(BaseModel): 
-    total: float = Field( None, ge=4999.99) 
-    quantity: int = Field (None,  gt=1) 
+    total: float | None = Field( None, ge=4999.99) 
+    quantity: int | None = Field (None,  gt=1) 
