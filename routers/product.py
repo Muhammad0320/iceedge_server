@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, status, HTTPException, Body, Query, Path
-from sqlalchemy import select, update
+from sqlalchemy import select, update, delete
 from ..db.model import Category, Product
 from ..db.schema import ProductCreate, ProductRead, ProductUpdate, Message, Cat
 from datetime import datetime
@@ -51,7 +51,7 @@ async def get_products_by_category(cat: Cat = Query(example=Cat.SHIIRT)):
 
 #TODO: For admins and merchants only
 @router.patch('/{id}' )
-async def update_product(id: int, session: AsyncSession = Depends(get_async_session), prod_updates: ProductUpdate = Body(example=ProductUpdate(price=49999))):
+async def update_product(id: int, session: AsyncSession = Depends(get_async_session), prod_updates: ProductUpdate = Body(...)) -> bool:
     if not prod_updates: 
         raise HTTPException(status_code=400, detail="You must update at least a field")
     q =  update(Product).where(Product.id == id).values(**prod_updates.model_dump( exclude_unset=True ))
@@ -61,4 +61,13 @@ async def update_product(id: int, session: AsyncSession = Depends(get_async_sess
         return False 
     return True 
 
+# TODO: For admins and merchants only
+@router.delete('/{id}')
+async def delete_product(id: int, session: AsyncSession = Depends(get_async_session)) -> bool: 
+    q =  delete(Product).where(Product.id == id) 
+    res = await session.execute(q)
+    await session.commit() 
+    if res.rowcount == 0: 
+        return False 
+    return True 
 
