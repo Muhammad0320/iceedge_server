@@ -14,10 +14,10 @@ async def  get_category_by_name(name: Cat, session: AsyncSession = Depends(get_a
 
 async def get_prods_by_cat(cat: Cat, session: AsyncSession = Depends(get_async_session)) -> Sequence[Product]: 
     cat_id = (await get_category_by_name(cat)).id 
-    q = select(Product).where(Product.cat_id == cat_id).order_by(Product.name)
+    q = select(Product).where(Product.cat_id == cat_id).order_by(Product.created_at)
     return (await session.scalars(q)).all() 
 
-async def check_product_or_404(id: int, session: AsyncSession = Depends(get_async_session)) -> Product : 
+async def get_product_or_404(id: int, session: AsyncSession = Depends(get_async_session)) -> Product : 
     q = select(Product).where(Product.id == id)
     res = (await session.execute(q)).scalar_one_or_none() 
     if not res: 
@@ -27,6 +27,7 @@ async def check_product_or_404(id: int, session: AsyncSession = Depends(get_asyn
 async def get_products(skip: int = Query(0), limit: int = Query(None, max=100, min=1), session: AsyncSession = Depends(get_async_session)):
     q = select(Product).order_by(Product.created_at).offset(skip).limit(limit)
     return (await session.scalars(q)).all() 
+
 
 @router.post('/', status_code=status.HTTP_201_CREATED,  response_model=ProductRead,responses={ status.HTTP_409_CONFLICT: {"model": Message()} }, 
 )
@@ -48,4 +49,16 @@ async def get_products_by_category(cat: Cat = Query(example=Cat.SHIIRT)):
     products = await get_prods_by_cat(cat=cat)
     return products
 
-@router.patch('/{id}')
+#TODO: For admins and merchants only
+@router.patch('/{id}' )
+async def update_product(id: int, session: AsyncSession = Depends(get_async_session), prod_updates: ProductUpdate = Body(example=ProductUpdate(price=49999))):
+    if not prod_updates: 
+        raise HTTPException(status_code=400, detail="You must update at least a field")
+    q =  update(Product).where(Product.id == id).values(**prod_updates.model_dump( exclude_unset=True ))
+    res = await session.execute(q)
+    await session.commit() 
+    if res.rowcount == 0: 
+        return False 
+    return True 
+
+

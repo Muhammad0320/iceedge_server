@@ -49,6 +49,7 @@ class ProductRead(ProductBase):
 class ProductUpdate(BaseModel): 
     discount: int = Field(None, ge=0, le=99) 
     name: str = Field(None) 
+    price: float = Field(None) 
     description: str = Field(None) 
     category: Cat = Field(None) 
     thumbnail: str = Field(None) 
