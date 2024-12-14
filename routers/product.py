@@ -44,6 +44,9 @@ async def get_all_products():
     products = await get_products()
     return products
 
+@router.get('/{id}', response_model=ProductRead)
+async def get_product_by_id(product: Product = Depends(get_product_or_404)): 
+    return product
 
 @router.get('/{cat}')
 async def get_products_by_category(cat: Cat = Query(example=Cat.SHIIRT)): 
