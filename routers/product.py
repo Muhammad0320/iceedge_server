@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, status, HTTPException, Body, Query, Path
-from sqlalchemy import select
+from sqlalchemy import select, update
 from ..db.model import Category, Product
 from ..db.schema import ProductCreate, ProductRead, ProductUpdate, Message, Cat
 from datetime import datetime
@@ -17,7 +17,12 @@ async def get_prods_by_cat(cat: Cat, session: AsyncSession = Depends(get_async_s
     q = select(Product).where(Product.cat_id == cat_id).order_by(Product.name)
     return (await session.scalars(q)).all() 
 
-
+async def check_product_or_404(id: int, session: AsyncSession = Depends(get_async_session)): 
+    q = select(Product).where(Product.id == id)
+    res = (await session.execute(q)).scalar_one_or_none() 
+    if not res: 
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Product not found") 
+    
 async def get_products(skip: int = Query(0), limit: int = Query(None, max=100, min=1), session: AsyncSession = Depends(get_async_session)):
     q = select(Product).order_by(Product.created_at)
     return (await session.scalars(q)).all() 
@@ -37,8 +42,9 @@ async def get_all_products():
     products = await get_products()
     return products
 
-
 @router.get('/{cat}')
 async def get_products_by_category(cat: Cat = Query(example=Cat.SHIIRT)): 
     products = await get_prods_by_cat(cat=cat)
     return products
+
+@router.patch('/{id}')

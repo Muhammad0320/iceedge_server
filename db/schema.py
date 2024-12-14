@@ -17,7 +17,7 @@ class Cat(str, Enum):
     MASK = "mask"
 
 class Message: 
-    message: str = "Something went wrong!"
+    detail: str = "Something went wrong!"
 
 class OrderStatus(str, Enum): 
     DELIVERED='delivered'

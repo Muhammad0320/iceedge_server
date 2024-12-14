@@ -12,6 +12,6 @@ app = FastAPI(lifespan=lifespan)
 
 @app.get('/hello')
 async def welcome(): 
-    return "Welcome to Iceedge Boutique, what do you need?"
+    return "Welcome to Iceedge, what do you need?"
 
 app.include_router(router=product.router)
