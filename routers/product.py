@@ -44,13 +44,14 @@ async def get_all_products():
     products = await get_products()
     return products
 
+
 @router.get('/{cat}')
 async def get_products_by_category(cat: Cat = Query(example=Cat.SHIIRT)): 
     products = await get_prods_by_cat(cat=cat)
     return products
 
 #TODO: For admins and merchants only
-@router.patch('/{id}' )
+@router.patch('/{id}' , status_code=status.HTTP_200_OK)
 async def update_product(id: int, session: AsyncSession = Depends(get_async_session), prod_updates: ProductUpdate = Body(...)) -> bool:
     if not prod_updates: 
         raise HTTPException(status_code=400, detail="You must update at least a field")
@@ -62,7 +63,7 @@ async def update_product(id: int, session: AsyncSession = Depends(get_async_sess
     return True 
 
 # TODO: For admins and merchants only
-@router.delete('/{id}')
+@router.delete('/{id}', status_code=status.HTTP_204_NO_CONTENT)
 async def delete_product(id: int, session: AsyncSession = Depends(get_async_session)) -> bool: 
     q =  delete(Product).where(Product.id == id) 
     res = await session.execute(q)
