@@ -38,7 +38,7 @@ class Product(Base):
     ratings_count: Mapped[int] = mapped_column(Float, default=0) 
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now) 
     reviews: Mapped[Optional[List["Review"]]] = relationship("Review", cascade='all, delete') 
-    
+    cat: Mapped['Category'] = relationship(back_populates='products')
 
 class User(Base): 
     __tablename__='users'
@@ -89,6 +89,7 @@ class Category(Base):
     __tablename__= "categories"
     id: Mapped[int] = mapped_column(Integer, primary_key=True) 
     name: Mapped[Cat] = mapped_column(Enum(Cat), unique=True, index=True) 
+    products: Mapped[List["Product"]] = relationship(back_populates='cat')
 
 class Item(Base): 
     __tablename__= "items"
@@ -96,5 +97,5 @@ class Item(Base):
     total: Mapped[float] = mapped_column(Float) 
     quantity: Mapped[int] = mapped_column(Integer, default=1) 
     product_id: Mapped[int] = mapped_column(ForeignKey('products.id')) 
-    product: Mapped[Product] = relationship("Product") 
+    product: Mapped['Product'] = relationship("Product") 
     order_id: Mapped[int] = mapped_column(ForeignKey('order.id'), index=True)
