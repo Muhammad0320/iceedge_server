@@ -22,3 +22,9 @@ async def create_post(new_review: ReviewCreate = Body(example=ReviewCreate(conte
     session.add(review)
     await session.commit() 
     return review
+
+
+
+@router.get('/{id}', response_model=ReviewRead)
+async def get_review(review: Review = Depends(get_review_or_404)): 
+    return review
