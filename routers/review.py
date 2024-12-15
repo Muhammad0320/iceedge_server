@@ -28,11 +28,20 @@ async def get_review(review: Review = Depends(get_review_or_404)):
     return review
 
 @router.patch('/{id}')
-async def update_review(id: int = Path(...), updates: ReviewUpdate = Body(example=ReviewUpdate(rating=5.0, rating='new rating')), session: AsyncSession = Depends(get_async_session)): 
+async def update_review(id: int = Path(...), updates: ReviewUpdate = Body(example=ReviewUpdate(rating=5.0, content='new rating')), session: AsyncSession = Depends(get_async_session)): 
     if not updates: 
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='You must at least update a field!')
     q = update(Review).where(Review.id == id).values(**updates.model_dump(exclude_unset=True))
     result = await session.execute(q) 
+    await session.commit() 
     if result.rowcount == 0: 
         return False 
     return True 
+
+@router.delete('/{id}', status_code=status.HTTP_204_NO_CONTENT) 
+async def delete_review(id: int = Path(...), session: AsyncSession = Depends(get_async_session)): 
+    q = delete(Review).where(Review.id == id) 
+    result = await session.execute(q) 
+    if result.rowcount == 0: 
+        return False 
+    return True
