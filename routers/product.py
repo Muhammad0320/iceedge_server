@@ -12,6 +12,7 @@ async def  get_category_by_name(name: Cat, session: AsyncSession = Depends(get_a
     query = select(Category).where(Category.name == name)
     return (await session.execute(query)).scalar_one() 
 
+
 async def get_prods_by_cat(cat: Cat, session: AsyncSession = Depends(get_async_session)) -> Sequence[Product]: 
     cat_id = (await get_category_by_name(cat)).id 
     q = select(Product).where(Product.cat_id == cat_id).order_by(Product.created_at)
@@ -33,11 +34,11 @@ async def get_products(skip: int = Query(0), limit: int = Query(None, max=100, m
 )
 async def add_new_prod( new_product: ProductCreate =  Body(example=ProductCreate(name="Product name", price=9999.99,description="product description" ,discount=10, cat=Cat.SHIIRT, thumbnail='product_thumbnail.jpg', amt_left=5, gallery=['second_img.jpg', 'first_img.jpg'], created_at=datetime.now() )), session: AsyncSession = Depends(get_async_session)): 
     fetched_cat = await get_category_by_name(new_product.cat) 
-    product = Product(**new_product.model_dump(exclude_unset=True))
-    product.cat_id = fetched_cat.id 
+    product = Product(**new_product.model_dump(exclude_unset=True), cat=fetched_cat)
     session.add(product) 
     await session.commit()   
     return product
+
 
 @router.get('/', response_model=list[ProductRead])
 async def get_all_products(): 
@@ -48,15 +49,15 @@ async def get_all_products():
 async def get_product_by_id(product: Product = Depends(get_product_or_404)): 
     return product
 
-@router.get('/{cat}')
+@router.get('/{cat}', response_model=list[Product])
 async def get_products_by_category(cat: Cat = Query(example=Cat.SHIIRT)): 
-    products = await get_prods_by_cat(cat=cat)
-    return products
+    category = await get_category_by_name(cat)
+    return category.products
 
 @router.get('/group_by_cat')
 async def get_products_group_by_cat(session: AsyncSession = Depends(get_async_session)): 
-    q = select(Product, func.count() ).group_by('Product.cat')
-    return (await session.scalars(q)).all() 
+    q = select(Product, Category).join(Product.cat) 
+    return (await session.execute(q)).all() 
 
 #TODO: For admins and merchants only
 @router.patch('/{id}' , status_code=status.HTTP_200_OK)

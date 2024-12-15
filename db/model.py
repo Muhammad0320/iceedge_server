@@ -91,6 +91,7 @@ class Category(Base):
     name: Mapped[Cat] = mapped_column(Enum(Cat), unique=True, index=True) 
     products: Mapped[List["Product"]] = relationship(back_populates='cat')
 
+
 class Item(Base): 
     __tablename__= "items"
     id: Mapped[int] = mapped_column(Integer, primary_key=True) 
