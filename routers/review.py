@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, status, Body, HTTPException
+from fastapi import APIRouter, Depends, status, Body, HTTPException, Path
 from ..db.schema import ReviewCreate, ReviewRead, ReviewUpdate
 from ..db.db_conn import AsyncSession, get_async_session
 from ..db.model import Review, Product
@@ -23,8 +23,16 @@ async def create_post(new_review: ReviewCreate = Body(example=ReviewCreate(conte
     await session.commit() 
     return review
 
-
-
 @router.get('/{id}', response_model=ReviewRead)
 async def get_review(review: Review = Depends(get_review_or_404)): 
     return review
+
+@router.patch('/{id}')
+async def update_review(id: int = Path(...), updates: ReviewUpdate = Body(example=ReviewUpdate(rating=5.0, rating='new rating')), session: AsyncSession = Depends(get_async_session)): 
+    if not updates: 
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='You must at least update a field!')
+    q = update(Review).where(Review.id == id).values(**updates.model_dump(exclude_unset=True))
+    result = await session.execute(q) 
+    if result.rowcount == 0: 
+        return False 
+    return True 
