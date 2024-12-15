@@ -3,6 +3,7 @@ from datetime import datetime
 from enum import Enum 
 from typing_extensions import Self
 
+
 class Role(str, Enum): 
     ADMIN = 'admin'
     CUSTOMER = 'customer' 
@@ -30,7 +31,6 @@ class ProductBase(BaseModel):
     name: str 
     description: str 
     thumbnail: str 
-    cat: Cat 
     gallery: list[str] 
     amt_left: int = Field(..., ge=1) 
     created_at: datetime = Field(default_factory=datetime.now)
@@ -39,12 +39,14 @@ class ProductBase(BaseModel):
 
 class ProductCreate(ProductBase): 
     pass 
+    cat: Cat 
 
 class ProductRead(ProductBase): 
     id: int  
     avg_rating: float = Field(0, ge=1.0, le=5.0)
     ratings_count: int = Field(0, ge=0)
     reviews: list["ReviewRead"] | None = Field(None) 
+    cat: 'CategoryRead'
 
 class ProductUpdate(BaseModel): 
     discount:  int | None = Field(None, ge=0, le=99) 
@@ -104,6 +106,8 @@ class ReviewCreate(ReviewBase):
 class ReviewRead(ReviewBase): 
     id: int 
     num_marked_useful: int = Field(0)
+    user: UserRead
+    
     
 class ReviewUpdate(BaseModel): 
     content: str | None = Field(None)
@@ -143,6 +147,7 @@ class CategoryCreate(CategoryBase):
 
 class CategoryRead(CategoryBase): 
     id: int 
+    products: list['ProductRead']
 
 class CategoryUpdate(BaseModel): 
     name: Cat | None = Field(None)
