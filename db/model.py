@@ -51,7 +51,7 @@ class User(Base):
     shipping_address: Mapped[ Optional[str]] = mapped_column(Text) 
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now) 
     orders: Mapped[Optional[List["Order"]]] = relationship("Order", cascade='all, delete')
-    
+    reviews: Mapped['Review']  = relationship(back_populates='user')
 
 class Review(Base): 
     __tablename__ = 'reviews'
@@ -61,6 +61,7 @@ class Review(Base):
     num_marked_useful: Mapped[int] = mapped_column(Integer, default=0) 
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now) 
     product_id: Mapped[int] = mapped_column(ForeignKey('products.id'), index=True)  
+    user: Mapped['User'] = relationship(back_populates='reviews')
     product: Mapped["Product"] = relationship("Product", back_populates='reviews') 
     
 
@@ -90,7 +91,6 @@ class Category(Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True) 
     name: Mapped[Cat] = mapped_column(Enum(Cat), unique=True, index=True) 
     products: Mapped[List["Product"]] = relationship(back_populates='cat')
-
 
 class Item(Base): 
     __tablename__= "items"
