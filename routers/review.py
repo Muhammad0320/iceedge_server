@@ -16,3 +16,9 @@ async def get_review_or_404(id: int, session: AsyncSession = Depends(get_async_s
 async def get_reviews_by_prod(product: Product = Depends(get_product_or_404)): 
     return product.reviews
 
+@router.post('/', response_model=ReviewRead, status_code=status.HTTP_201_CREATED)
+async def create_post(new_review: ReviewCreate = Body(example=ReviewCreate(content="The best", rating=5.0, product_id=999)), session: AsyncSession = Depends(get_async_session)): 
+    review = Review(**new_review.model_dump(exclude_unset=True))
+    session.add(review)
+    await session.commit() 
+    return review
