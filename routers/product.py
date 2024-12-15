@@ -56,8 +56,8 @@ async def get_products_by_category(cat: Cat = Query(example=Cat.SHIIRT)):
 
 @router.get('/group_by_cat')
 async def get_products_group_by_cat(session: AsyncSession = Depends(get_async_session)): 
-    q = select(Product, Category).join(Product.cat) 
-    return (await session.execute(q)).all() 
+    q = select(Product, Category.name.label('category'), func.count(Product.id).label('num_products')).join(Category.products).group_by(Category.name).order_by(Category.name)
+    return (await session.execute(q)).all()
 
 #TODO: For admins and merchants only
 @router.patch('/{id}' , status_code=status.HTTP_200_OK)
