@@ -103,7 +103,8 @@ class ReviewCreate(ReviewBase):
 
 class ReviewRead(ReviewBase): 
     id: int 
-
+    num_marked_useful: int = Field(0)
+    
 class ReviewUpdate(BaseModel): 
     content: str | None = Field(None)
     rating: float | None = Field(None, ge=1.0, le=5.0)
