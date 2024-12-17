@@ -91,7 +91,7 @@ class Item(Base):
     total: Mapped[float] = mapped_column(Float) 
     quantity: Mapped[int] = mapped_column(Integer, default=1) 
     product_id: Mapped[int] = mapped_column(ForeignKey('products.id')) 
-    product: Mapped['Product'] = relationship("Product") 
+    product: Mapped['Product'] = relationship("Product", lazy='joined') 
 
 class OrderItem(Item):
     __tablename__="order_items"
