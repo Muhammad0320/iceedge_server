@@ -3,6 +3,7 @@ from ..db.schema import ReviewCreate, ReviewRead, ReviewUpdate
 from ..db.db_conn import AsyncSession, get_async_session
 from ..db.model import  Product, OrderItem, User, Order
 from sqlalchemy import select, update, delete 
+from sqlalchemy.orm import joinedload
 # from .product import get_product_or_404
 
 router = APIRouter(prefix='/order_item', tags=['order', 'item'])
@@ -14,7 +15,13 @@ async def get_item_or_404(id: int, session: AsyncSession = Depends(get_async_ses
     return result
 
 async def get_order_or_404(id: int, session: AsyncSession = Depends(get_async_session)) -> Order: 
-    result = (await session.scalars(select(Order, OrderItem ).where(Order.id == id))).one_or_none() 
+    result = (await session.scalars(select(Order, OrderItem ).where(Order.id == id).options(joinedload(Order.order_items)))).one_or_none() 
+    if not result: 
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Order not found')
+    return result
+
+async def get_user_orders_or_404(id: int, session: AsyncSession = Depends(get_async_session)): 
+    result = (await session.scalars(select(Order).where(Order.customer == id).options(joinedload(Order.order_items)))).all() 
     if not result: 
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Order not found')
     return result
@@ -33,3 +40,6 @@ async def get_all_items(session: AsyncSession = Depends(get_async_session)):
 async def get_items_by_order( order: Order = Depends(get_order_or_404), session: AsyncSession = Depends(get_async_session)): 
     return order 
 
+@router.get('/user/{id}')
+async def get_order_by_user(order = Depends(get_user_orders_or_404)): 
+    return order
