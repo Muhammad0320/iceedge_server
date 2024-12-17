@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends, status, HTTPException, Body, Query, Path
 from sqlalchemy import select, update, delete, func
+from sqlalchemy.orm import joinedload
 from ..db.model import Category, Product
 from ..db.schema import ProductCreate, ProductRead, ProductUpdate, Message, Cat
 from datetime import datetime
@@ -15,11 +16,11 @@ async def  get_category_by_name(name: Cat, session: AsyncSession = Depends(get_a
 
 async def get_prods_by_cat(cat: Cat, session: AsyncSession = Depends(get_async_session)) -> Sequence[Product]: 
     cat_id = (await get_category_by_name(cat)).id 
-    q = select(Product).where(Product.cat_id == cat_id).order_by(Product.created_at)
+    q = select(Product, Category.name).where(Product.cat_id == cat_id).join(Product.cat).order_by(Product.created_at).options(joinedload(Product.cat))
     return (await session.scalars(q)).all() 
 
 async def get_product_or_404(id: int, session: AsyncSession = Depends(get_async_session)) -> Product : 
-    q = select(Product).where(Product.id == id)
+    q = select(Product, Category.name).where(Product.id == id).options(joinedload(Product.cat))
     res = (await session.execute(q)).scalar_one_or_none() 
     if not res: 
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Product not found") 
@@ -49,10 +50,10 @@ async def get_all_products():
 async def get_product_by_id(product: Product = Depends(get_product_or_404)): 
     return product
 
-@router.get('/{cat}', response_model=list[Product])
+@router.get('/{cat}')
 async def get_products_by_category(cat: Cat = Query(example=Cat.SHIIRT)): 
     category = await get_category_by_name(cat)
-    return category.products
+    q = select(Product.cat).join()
 
 @router.get('/group_by_cat')
 async def get_products_group_by_cat(session: AsyncSession = Depends(get_async_session)): 
