@@ -34,19 +34,18 @@ class ProductBase(BaseModel):
     gallery: list[str] 
     amt_left: int = Field(..., ge=1) 
     created_at: datetime = Field(default_factory=datetime.now)
+    cat: Cat 
     class Config:
         orm_mode=True 
 
 class ProductCreate(ProductBase): 
     pass 
-    cat: Cat 
 
 class ProductRead(ProductBase): 
     id: int  
     avg_rating: float = Field(0, ge=1.0, le=5.0)
     ratings_count: int = Field(0, ge=0)
     reviews: list["ReviewRead"] | None = Field(None) 
-    cat: 'CategoryRead'
 
 class ProductUpdate(BaseModel): 
     discount:  int | None = Field(None, ge=0, le=99) 
