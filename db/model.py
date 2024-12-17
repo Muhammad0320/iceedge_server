@@ -99,4 +99,4 @@ class Item(Base):
     quantity: Mapped[int] = mapped_column(Integer, default=1) 
     product_id: Mapped[int] = mapped_column(ForeignKey('products.id')) 
     product: Mapped['Product'] = relationship("Product") 
-    order_id: Mapped[int] = mapped_column(ForeignKey('order.id'), index=True)
+    order_id: Mapped[ Optional[int]] = mapped_column(ForeignKey('order.id'), index=True)

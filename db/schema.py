@@ -156,7 +156,7 @@ class ItemBase(BaseModel):
     total: float = Field(..., ge=4999.99) 
     quantity: int = Field(..., gt=1) 
     product_id: int 
-    order_id: int 
+    order_id: int | None = None
     class Config:
         orm_mode=True 
 
