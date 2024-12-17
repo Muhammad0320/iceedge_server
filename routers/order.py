@@ -6,7 +6,7 @@ from sqlalchemy import select, update, delete
 from sqlalchemy.orm import joinedload
 # from .product import get_product_or_404
 
-router = APIRouter(prefix='/order_item', tags=['order', 'item'])
+router = APIRouter(prefix='/order', tags=['order', 'item'])
 
 async def get_item_or_404(id: int, session: AsyncSession = Depends(get_async_session)) -> OrderItem: 
     result = (await  session.scalars(select(OrderItem).where(OrderItem.id == id))).one_or_none()
@@ -26,20 +26,29 @@ async def get_user_orders_or_404(id: int, session: AsyncSession = Depends(get_as
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Order not found')
     return result
     
-@router.get('/{id}', response_model=OrderItem) 
+@router.get('/items/{id}', response_model=OrderItem) 
 async def get_item_by_id(item: OrderItem = Depends(get_item_or_404), session: AsyncSession = Depends(get_async_session)):
     return item
 
+
 # TODO: Only Admins and Developer
-@router.get('/', response_model=list[OrderItem])
+@router.get('/items', response_model=list[OrderItem])
 async def get_all_items(session: AsyncSession = Depends(get_async_session)): 
     result = (await session.scalars(select(OrderItem))).all() 
     return result
+
     
-@router.get('/order/{id}', response_model=list[OrderItem])
+@router.get('/{id}', response_model=list[OrderItem])
 async def get_items_by_order( order: Order = Depends(get_order_or_404), session: AsyncSession = Depends(get_async_session)): 
     return order 
 
+# TODO: Only admin and developer
+@router.get('/', response_model=list[OrderItem])
+async def get_all_order(session: AsyncSession = Depends(get_async_session)): 
+    result = (await session.scalars(select(Order))).all()
+    return result
+
+    
 @router.get('/user/{id}')
 async def get_order_by_user(order = Depends(get_user_orders_or_404)): 
     return order
