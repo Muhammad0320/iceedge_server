@@ -79,13 +79,6 @@ class Order(Base):
     order_items: Mapped[List['Item']] = relationship("Item") 
 
 
-# class Cart(Base): 
-#     __tablename__= "carts"
-#     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True) 
-#     total: Mapped[float] = mapped_column(Float, nullable=False) 
-    
-#     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now) 
-
 class Category(Base): 
     __tablename__= "categories"
     id: Mapped[int] = mapped_column(Integer, primary_key=True) 
@@ -93,10 +86,26 @@ class Category(Base):
     products: Mapped[List["Product"]] = relationship(back_populates='cat')
 
 class Item(Base): 
-    __tablename__= "items"
+    # __tablename__= "items"
     id: Mapped[int] = mapped_column(Integer, primary_key=True) 
     total: Mapped[float] = mapped_column(Float) 
     quantity: Mapped[int] = mapped_column(Integer, default=1) 
     product_id: Mapped[int] = mapped_column(ForeignKey('products.id')) 
     product: Mapped['Product'] = relationship("Product") 
-    order_id: Mapped[ Optional[int]] = mapped_column(ForeignKey('order.id'), index=True)
+
+class OrderItem(Item):
+    __tablename__="order_items"
+    order_id: Mapped[Optional[int]] = mapped_column(ForeignKey('orders.id'), index=True)
+
+class CartItem(Item):
+    __tablename__="cart_items"
+    cart_id: Mapped[Optional[int]] = mapped_column(ForeignKey('carts.id'), index=True)
+    cart: Mapped[Optional["Cart"]] = relationship(back_populates='cart_items')
+
+class Cart(Base): 
+    __tablename__= "carts"
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True) 
+    total: Mapped[float] = mapped_column(Float, nullable=False) 
+    user_id: Mapped[int] = mapped_column(ForeignKey('user.id'), index=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now) 
+    cart_items: Mapped[List["CartItem"]] = relationship(back_populates='cart')

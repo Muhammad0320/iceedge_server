@@ -156,7 +156,6 @@ class ItemBase(BaseModel):
     total: float = Field(..., ge=4999.99) 
     quantity: int = Field(..., gt=1) 
     product_id: int 
-    order_id: int | None = None
     class Config:
         orm_mode=True 
 
@@ -169,3 +168,9 @@ class ItemRead(ItemBase):
 class ItemUpdate(BaseModel): 
     total: float | None = Field( None, ge=4999.99) 
     quantity: int | None = Field (None,  gt=1) 
+
+class CartItem(ItemRead): 
+    cart_id: int 
+
+class OrderItem(ItemRead):
+    order_id: int
