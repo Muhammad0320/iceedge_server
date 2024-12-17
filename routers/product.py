@@ -51,9 +51,10 @@ async def get_product_by_id(product: Product = Depends(get_product_or_404)):
     return product
 
 @router.get('/{cat}')
-async def get_products_by_category(cat: Cat = Query(example=Cat.SHIIRT)): 
-    category = await get_category_by_name(cat)
-    q = select(Product.cat).join()
+async def get_products_by_category(cat: Cat = Query(example=Cat.SHIIRT), session: AsyncSession = Depends(get_async_session)): 
+    # category = await get_category_by_name(cat)
+    q = select(Product, Category.name).join(Product.cat, onclause=Product.cat_id == Category.id) 
+    return (await session.scalars(q)).all()      
 
 @router.get('/group_by_cat')
 async def get_products_group_by_cat(session: AsyncSession = Depends(get_async_session)): 
