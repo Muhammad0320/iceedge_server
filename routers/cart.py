@@ -14,5 +14,7 @@ async def get_cart_by_user(id: int, session: AsyncSession = Depends(get_async_se
         return None 
     return result
 
+@router.get('/user/{id}', response_model=Cart) 
+async def get_cart_by_user_id(cart: Cart = Depends(get_cart_by_user)): 
+    return cart 
 
-    
