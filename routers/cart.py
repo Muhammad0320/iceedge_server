@@ -8,7 +8,7 @@ from sqlalchemy.orm import joinedload
 router = APIRouter(prefix='/cart', tags=['cart', 'item'])
 
 async def get_cart_by_user(id: int, session: AsyncSession = Depends(get_async_session)): 
-    q = select(Cart).where(Cart.user_id == id)
+    q = select(Cart).where(Cart.user_id == id).order_by(Cart.created_at)
     result = (await session.execute(q)).one_or_none()
     if not result: 
         return None 
@@ -17,4 +17,10 @@ async def get_cart_by_user(id: int, session: AsyncSession = Depends(get_async_se
 @router.get('/user/{id}', response_model=Cart) 
 async def get_cart_by_user_id(cart: Cart = Depends(get_cart_by_user)): 
     return cart 
+
+# TODO: For developer only
+@router.get('/')
+async def get_all_carts(session: AsyncSession = Depends(get_async_session)): 
+    q = select(Cart).order_by(Cart.created_at)
+    return (await session.execute(q) ).all() 
 
