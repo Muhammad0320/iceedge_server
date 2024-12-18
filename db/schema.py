@@ -174,3 +174,9 @@ class CartItem(ItemRead):
 
 class OrderItem(ItemRead):
     order_id: int
+
+class CartUpdate(BaseModel): 
+    total: float | None = Field( None, ge=4999.99) 
+    quantity: int | None = Field (None,  gt=1) 
+    cart_items: CartItem | None = Field(None) 
+    
