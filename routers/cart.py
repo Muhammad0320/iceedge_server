@@ -14,6 +14,13 @@ async def get_cart_by_user(id: int, session: AsyncSession = Depends(get_async_se
         return None 
     return result
 
+async def get_cart_or_none(id: int, session: AsyncSession = Depends(get_async_session)): 
+    q = select(Cart).where(Cart.id == id).order_by(Cart.created_at)
+    result = (await session.execute(q)).one_or_none() 
+    if not result: 
+        return None 
+    return result
+
 @router.get('/user/{id}', response_model=Cart) 
 async def get_cart_by_user_id(cart: Cart = Depends(get_cart_by_user)): 
     return cart 
