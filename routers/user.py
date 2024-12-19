@@ -13,6 +13,13 @@ from ..security.authenticate import authenticate, create_access_token
 
 router = APIRouter(prefix='/user', tags=['users', 'all']) 
 
+async def get_current_user_by_token(token_str: str = Depends(OAuth2PasswordBearer(tokenUrl='/token')), session: AsyncSession = Depends(get_async_session)):
+    q = select(AccessToken).where(and_(AccessToken.token == token_str, AccessToken.expiration_date == datetime.now(tz=timezone.utc)))
+    token = (await session.scalars(q)).one_or_none() 
+    if not token: 
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED) 
+    return token.user 
+
 @router.post('/register', response_model=UserRead)
 async def register_user(user: UserCreate, session: AsyncSession = Depends(get_async_session)): 
     hashed_password = hash_password(user.password)
@@ -33,10 +40,7 @@ async def signin(credential: OAuth2PasswordRequestForm = Depends(OAuth2PasswordR
     token = await create_access_token(user, session) 
     return {"access_token": token.token, "token_type": "bearer"}
 
-async def get_current_user(token_str: str = Depends(OAuth2PasswordBearer(tokenUrl='/token')), session: AsyncSession = Depends(get_async_session)):
-    q = select(AccessToken).where(and_(AccessToken.token == token_str, AccessToken.expiration_date == datetime.now(tz=timezone.utc)))
-    token = (await session.scalars(q)).one_or_none() 
-    if not token: 
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED) 
-    return token.user 
+@router.get('/current_user', response_model=User)
+async def get_current_user(user: User = Depends(get_current_user_by_token)):
+    return user
 
