@@ -181,7 +181,7 @@ class CartUpdate(BaseModel):
     cart_items: CartItem | None = Field(None) 
     
     
-class Authenticate(BaseModel): 
+class Credential(BaseModel): 
     email: EmailStr
     password: str 
     class Config: 

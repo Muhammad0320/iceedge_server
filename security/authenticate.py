@@ -1,13 +1,12 @@
 from fastapi import  HTTPException, status
 from .password import verify_password
 from ..db.db_conn import AsyncSession
-from ..db.schema import Authenticate
+from ..db.schema import Credential
 from ..db.model import User, AccessToken
 from sqlalchemy import select
 
 
-
-async def authenticate(user: Authenticate, session: AsyncSession ) -> User | None : 
+async def authenticate(user: Credential, session: AsyncSession ) -> User | None : 
     q = select(User).where(User.email == user.email)
     db_user = (await session.scalars(q)).one_or_none() 
     
