@@ -1,5 +1,4 @@
 from fastapi import APIRouter, Depends, status, HTTPException
-from ..db.schema import ReviewCreate, ReviewRead, ReviewUpdate
 from ..db.db_conn import AsyncSession, get_async_session
 from ..db.model import  Product, OrderItem, User, Order
 from sqlalchemy import select, update, delete 
@@ -48,7 +47,6 @@ async def get_all_order(session: AsyncSession = Depends(get_async_session)):
     result = (await session.scalars(select(Order))).all()
     return result
 
-    
 @router.get('/user/{id}')
 async def get_order_by_user(order = Depends(get_user_orders_or_404)): 
     return order
