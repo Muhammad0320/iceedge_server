@@ -1,12 +1,16 @@
+import secrets
 from sqlalchemy.orm import Mapped, mapped_column, DeclarativeBase, relationship
 from sqlalchemy import DateTime, String, Text, Integer, Float, JSON, Enum, ForeignKey
 from datetime import datetime
 from typing import List, Optional
 from datetime import timezone, timedelta
 
+
 def get_expiration_date(duration_seconds: int = 86400) -> datetime:
     return datetime.now(tz=timezone.utc) + timedelta(seconds=duration_seconds)
 
+def generate_token() -> str: 
+    return secrets.token_urlsafe(32) 
 class Base(DeclarativeBase):
     pass 
 
@@ -115,4 +119,6 @@ class Cart(Base):
     cart_items: Mapped[List["CartItem"]] = relationship(back_populates='cart')
 
 class AccessToken(Base): 
+    __tablename__= 'token'
+    id: Mapped[int] = mapped_column( Integer,primary_key=True, autoincrement=True)
     
