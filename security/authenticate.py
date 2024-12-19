@@ -1,15 +1,16 @@
-from fastapi import Depends, HTTPException, status
-from .password import verify_password, hash_password 
-from ..db.db_conn import get_async_session, AsyncSession
+from fastapi import  HTTPException, status
+from .password import verify_password
+from ..db.db_conn import AsyncSession
 from ..db.schema import Authenticate
-from ..db.model import User
+from ..db.model import User, AccessToken
 from sqlalchemy import select
 
 
 
-async def authenticate(user: Authenticate, session: AsyncSession = Depends(get_async_session)): 
+async def authenticate(user: Authenticate, session: AsyncSession ) -> User | None : 
     q = select(User).where(User.email == user.email)
-    db_user = (await session.execute(q)).one_or_none() 
+    db_user = (await session.scalars(q)).one_or_none() 
+    
     
     if not db_user: 
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='Password or username is invalid')
@@ -20,3 +21,8 @@ async def authenticate(user: Authenticate, session: AsyncSession = Depends(get_a
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='Password or username is invalid')    
     return db_user 
 
+async def create_access_token(user: User, session: AsyncSession): 
+    token = AccessToken(user=user)
+    session.add(token) 
+    await session.commit() 
+    return token 

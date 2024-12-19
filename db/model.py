@@ -125,4 +125,3 @@ class AccessToken(Base):
     token: Mapped[str] = mapped_column(String(1024), default=generate_token) 
     user_id: Mapped[int] = mapped_column(ForeignKey('users.id')) 
     user: Mapped["User"] = relationship(lazy='joined')
-
