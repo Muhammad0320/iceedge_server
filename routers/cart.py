@@ -3,7 +3,7 @@ from ..db.db_conn import AsyncSession, get_async_session
 from ..db.model import  Product, CartItem, User, Cart 
 from sqlalchemy import select, update, delete 
 from sqlalchemy.orm import joinedload
-from ..db.schema import CartItem, Cart, ItemUpdate
+from ..db.schema import  ItemUpdate
 
 router = APIRouter(prefix='/cart', tags=['cart', 'item'])
 
@@ -47,9 +47,16 @@ async def get_cart_by_id(cart: Cart = Depends(get_cart_or_none)):
 async def update_item(id: int, updates: ItemUpdate, session: AsyncSession = Depends(get_async_session)): 
     if not updates: 
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='There should be at least tan updated field')
-    
     q = update(CartItem).where(CartItem.id == id).values(**updates.model_dump(exclude_unset=True))  
     res = await session.execute(q) 
+    if res.rowcount == 0: 
+        return False 
+    return True 
+
+@router.delete('/item/{id}', status_code=status.HTTP_204_NO_CONTENT)
+async def delete_item(id: int, session: AsyncSession = Depends(get_async_session)): 
+    q = delete(CartItem).where(CartItem.id == id)
+    res = await session.execute(q)
     if res.rowcount == 0: 
         return False 
     return True 
