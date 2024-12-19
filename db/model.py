@@ -2,6 +2,10 @@ from sqlalchemy.orm import Mapped, mapped_column, DeclarativeBase, relationship
 from sqlalchemy import DateTime, String, Text, Integer, Float, JSON, Enum, ForeignKey
 from datetime import datetime
 from typing import List, Optional
+from datetime import timezone, timedelta
+
+def get_expiration_date(duration_seconds: int = 86400) -> datetime:
+    return datetime.now(tz=timezone.utc) + timedelta(seconds=duration_seconds)
 
 class Base(DeclarativeBase):
     pass 
@@ -109,3 +113,6 @@ class Cart(Base):
     user_id: Mapped[int] = mapped_column(ForeignKey('user.id'), index=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now) 
     cart_items: Mapped[List["CartItem"]] = relationship(back_populates='cart')
+
+class AccessToken(Base): 
+    
