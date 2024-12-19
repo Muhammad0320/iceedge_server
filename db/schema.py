@@ -180,3 +180,9 @@ class CartUpdate(BaseModel):
     quantity: int | None = Field (None,  gt=1) 
     cart_items: CartItem | None = Field(None) 
     
+    
+class Authenticate(BaseModel): 
+    email: EmailStr
+    password: str 
+    class Config: 
+        orm_mode=True 
