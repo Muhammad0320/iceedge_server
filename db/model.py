@@ -121,4 +121,7 @@ class Cart(Base):
 class AccessToken(Base): 
     __tablename__= 'token'
     id: Mapped[int] = mapped_column( Integer,primary_key=True, autoincrement=True)
-    
+    expiration_date: Mapped[datetime] = mapped_column(DateTime, default=get_expiration_date)
+    token: Mapped[str] = mapped_column(String(1024), default=generate_token) 
+    user_id: Mapped[int] = mapped_column(ForeignKey('users.id')) 
+    user: Mapped["User"] = relationship(lazy='joined')
