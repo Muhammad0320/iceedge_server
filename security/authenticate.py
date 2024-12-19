@@ -11,7 +11,6 @@ async def authenticate(user: Authenticate, session: AsyncSession ) -> User | Non
     q = select(User).where(User.email == user.email)
     db_user = (await session.scalars(q)).one_or_none() 
     
-    
     if not db_user: 
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='Password or username is invalid')
 
@@ -19,6 +18,7 @@ async def authenticate(user: Authenticate, session: AsyncSession ) -> User | Non
     
     if not is_valid_passsword: 
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='Password or username is invalid')    
+
     return db_user 
 
 async def create_access_token(user: User, session: AsyncSession): 
