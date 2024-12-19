@@ -8,7 +8,7 @@ from ..security.password import hash_password
 from ..db.schema import UserCreate, Message, UserRead, Credential
 from datetime import datetime
 from ..db.db_conn import AsyncSession, get_async_session
-from ..security.authenticate import authenticate
+from ..security.authenticate import authenticate, create_access_token
 
 router = APIRouter(prefix='/user', tags=['users', 'all']) 
 
@@ -27,4 +27,9 @@ async def register_user(user: UserCreate, session: AsyncSession = Depends(get_as
 @router.post('/token', response_model=UserRead)
 async def signin(credential: OAuth2PasswordRequestForm = Depends(OAuth2PasswordRequestForm), session: AsyncSession = Depends(get_async_session)): 
     email = credential.username; password = credential.password
-    
+    user = await authenticate(Credential(email=email, password=password), session) 
+    if not user: 
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid signin credentials")
+    token = await create_access_token(user, session) 
+    return {"access_token": token.token, "token_type": "bearer"}
+

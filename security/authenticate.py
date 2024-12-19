@@ -11,12 +11,12 @@ async def authenticate(user: Credential, session: AsyncSession ) -> User | None 
     db_user = (await session.scalars(q)).one_or_none() 
     
     if not db_user: 
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='Password or username is invalid')
+        return None
 
     is_valid_passsword = verify_password(user.password, db_user.password) 
     
     if not is_valid_passsword: 
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='Password or username is invalid')    
+        return None    
 
     return db_user 
 
