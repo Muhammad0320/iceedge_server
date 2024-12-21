@@ -2,6 +2,8 @@ from fastapi import FastAPI
 from contextlib import asynccontextmanager
 from .db.db_conn import create_all_tables
 from .routers import order, product, review, cart, user
+from starlette_csrf import CSRFMiddleware
+from starlette.middleware.cors import CORSMiddleware
 
 @asynccontextmanager
 async def lifespan(app: FastAPI): 
@@ -9,6 +11,15 @@ async def lifespan(app: FastAPI):
     yield
 
 app = FastAPI(lifespan=lifespan)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_methods='*',
+    allow_origins=['http://localhost:9000'],
+    allow_headers='*',
+    allow_credentials=True 
+    
+)
 
 @app.get('/hello')
 async def welcome(): 
