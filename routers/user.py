@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, status, HTTPException, Body, Query, Path
+from fastapi import APIRouter, Form, Depends, status, HTTPException, Body, Query, Path, Response
 from sqlalchemy import select, and_
 from sqlalchemy.orm import joinedload
 from ..db.model import User, AccessToken
@@ -9,6 +9,7 @@ from ..db.schema import UserCreate, Message, UserRead, Credential
 from datetime import datetime, timezone
 from ..db.db_conn import AsyncSession, get_async_session
 from ..security.authenticate import authenticate, create_access_token
+from ..main import TOKEN_COOKIE_NAME
 
 
 router = APIRouter(prefix='/user', tags=['users']) 
@@ -39,6 +40,22 @@ async def signin(credential: OAuth2PasswordRequestForm = Depends(OAuth2PasswordR
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid signin credentials")
     token = await create_access_token(user, session) 
     return {"access_token": token.token, "token_type": "bearer"}
+
+@router.post('/login')
+async def login(response: Response, email: str = Form(...), password: str = Form(...), session: AsyncSession = Depends(get_async_session)): 
+    user = await authenticate(Credential(email=email, password=password), session=session) 
+    if not user: 
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
+    token = await create_access_token(user=user, session=session)
+    response.set_cookie(
+        TOKEN_COOKIE_NAME,
+        token.token, 
+        max_age=token.max_age(),
+        samesite='lax',
+        secure=True, 
+        httponly=True
+    )    
+
 
 @router.get('/current_user', response_model=User)
 async def get_current_user(user: User = Depends(get_current_user_by_token)):
