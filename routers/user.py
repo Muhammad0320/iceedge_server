@@ -3,7 +3,7 @@ from sqlalchemy import select, and_
 from sqlalchemy.orm import joinedload
 from ..db.model import User, AccessToken
 from sqlalchemy.exc import IntegrityError
-from fastapi.security import OAuth2PasswordRequestForm, OAuth2PasswordBearer
+from fastapi.security import OAuth2PasswordRequestForm, OAuth2PasswordBearer, APIKeyCookie
 from ..security.password import hash_password
 from ..db.schema import UserCreate, Message, UserRead, Credential
 from datetime import datetime, timezone
@@ -56,8 +56,7 @@ async def login(response: Response, email: str = Form(...), password: str = Form
         httponly=True
     )    
 
-
-@router.get('/current_user', response_model=User)
-async def get_current_user(user: User = Depends(get_current_user_by_token)):
-    return user
-
+@router.get('/me', response_model=User)
+async def get_current_user(token: str = Depends(APIKeyCookie(name=TOKEN_COOKIE_NAME)), session: AsyncSession = Depends(get_async_session)): 
+    user = await get_current_user_by_token(token_str=token) 
+    return user     
