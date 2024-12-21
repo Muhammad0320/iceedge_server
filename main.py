@@ -6,7 +6,7 @@ from starlette_csrf import CSRFMiddleware
 from starlette.middleware.cors import CORSMiddleware
 
 
-TOKEN_NAME='token'
+TOKEN_COOKIE_NAME='token'
 CSFR_TOKEN_SECRET='my_super_long_and_ultra_secured_csrf_secret_for_iceedge'
 
 @asynccontextmanager
@@ -18,9 +18,9 @@ app = FastAPI(lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_methods='*',
+    allow_methods=['*'],
     allow_origins=['http://localhost:9000'],
-    allow_headers='*',
+    allow_headers=['*'],
     allow_credentials=True 
     
 )
@@ -28,7 +28,7 @@ app.add_middleware(
 app.add_middleware(
     CSRFMiddleware,
     secret=CSFR_TOKEN_SECRET,
-    sensitive_cookies={TOKEN_NAME}, 
+    sensitive_cookies={TOKEN_COOKIE_NAME}, 
     cookie_domain='localhost'
 )
 
