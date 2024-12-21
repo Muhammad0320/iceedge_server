@@ -11,7 +11,7 @@ from ..db.db_conn import AsyncSession, get_async_session
 from ..security.authenticate import authenticate, create_access_token
 
 
-router = APIRouter(prefix='/user', tags=['users', 'all']) 
+router = APIRouter(prefix='/user', tags=['users']) 
 
 async def get_current_user_by_token(token_str: str = Depends(OAuth2PasswordBearer(tokenUrl='/token')), session: AsyncSession = Depends(get_async_session)):
     q = select(AccessToken).where(and_(AccessToken.token == token_str, AccessToken.expiration_date == datetime.now(tz=timezone.utc)))
