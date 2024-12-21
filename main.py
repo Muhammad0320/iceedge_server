@@ -5,6 +5,10 @@ from .routers import order, product, review, cart, user
 from starlette_csrf import CSRFMiddleware
 from starlette.middleware.cors import CORSMiddleware
 
+
+TOKEN_NAME='token'
+CSFR_TOKEN_SECRET='my_super_long_and_ultra_secured_csrf_secret_for_iceedge'
+
 @asynccontextmanager
 async def lifespan(app: FastAPI): 
     await create_all_tables() 
@@ -19,6 +23,13 @@ app.add_middleware(
     allow_headers='*',
     allow_credentials=True 
     
+)
+
+app.add_middleware(
+    CSRFMiddleware,
+    secret=CSFR_TOKEN_SECRET,
+    sensitive_cookies={TOKEN_NAME}, 
+    cookie_domain='localhost'
 )
 
 @app.get('/hello')
