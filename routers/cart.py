@@ -4,6 +4,7 @@ from ..db.model import  Product, CartItem, User, Cart
 from sqlalchemy import select, update, delete 
 from sqlalchemy.orm import joinedload
 from ..db.schema import  ItemUpdate
+from ..dependencies import get_curr_user, Rbac, Role
 
 router = APIRouter(prefix='/cart', tags=['cart', 'item'])
 
@@ -33,8 +34,14 @@ async def get_cart_item_or_none(id: int, session: AsyncSession = Depends(get_asy
 async def get_cart_by_user_id(cart: Cart = Depends(get_cart_by_user)): 
     return cart 
 
+@router.get('/my_cart')
+async def get_current_user_cart(user: User = Depends(get_curr_user)): 
+    result = await get_cart_by_user(user.id)
+    return result 
+
+    
 # TODO: For developer only
-@router.get('/')
+@router.get('/', dependencies=[ Depends(get_curr_user), Depends(Rbac(role=[Role.DEVELOPER, Role.MERCHANT]).accessible_to)])
 async def get_all_carts(session: AsyncSession = Depends(get_async_session)): 
     q = select(Cart).order_by(Cart.created_at)
     return (await session.execute(q) ).all() 
