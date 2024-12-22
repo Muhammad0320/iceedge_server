@@ -1,9 +1,10 @@
 from fastapi import APIRouter, Depends, status, HTTPException, Body, Query, Path
 from sqlalchemy import select, update, delete, func
 from sqlalchemy.orm import joinedload
-from ..db.model import Category, Product
+from ..db.model import Category, Product, User 
 from ..db.schema import ProductCreate, ProductRead, ProductUpdate, Message, Cat
 from datetime import datetime
+from ..dependencies import get_curr_user
 from ..db.db_conn import AsyncSession, get_async_session
 from typing import Sequence
 
@@ -31,9 +32,9 @@ async def get_products(skip: int = Query(0), limit: int = Query(None, max=100, m
     return (await session.scalars(q)).all() 
 
 
-@router.post('/', status_code=status.HTTP_201_CREATED,  response_model=ProductRead,responses={ status.HTTP_409_CONFLICT: {"model": Message()} }, 
+@router.post('/',status_code=status.HTTP_201_CREATED,  response_model=ProductRead,responses={ status.HTTP_409_CONFLICT: {"model": Message()} }, 
 )
-async def add_new_prod( new_product: ProductCreate =  Body(example=ProductCreate(name="Product name", price=9999.99,description="product description" ,discount=10, cat=Cat.SHIIRT, thumbnail='product_thumbnail.jpg', amt_left=5, gallery=['second_img.jpg', 'first_img.jpg'], created_at=datetime.now() )), session: AsyncSession = Depends(get_async_session)): 
+async def add_new_prod( user: User = Depends(get_curr_user) ,new_product: ProductCreate =  Body(example=ProductCreate(name="Product name", price=9999.99,description="product description" ,discount=10, cat=Cat.SHIIRT, thumbnail='product_thumbnail.jpg', amt_left=5, gallery=['second_img.jpg', 'first_img.jpg'], created_at=datetime.now() )), session: AsyncSession = Depends(get_async_session)): 
     fetched_cat = await get_category_by_name(new_product.cat) 
     product = Product(**new_product.model_dump(exclude_unset=True), cat=fetched_cat)
     session.add(product) 
