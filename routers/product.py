@@ -4,7 +4,7 @@ from sqlalchemy.orm import joinedload
 from ..db.model import Category, Product, User 
 from ..db.schema import ProductCreate, ProductRead, ProductUpdate, Message, Cat, Role
 from datetime import datetime
-from ..dependencies import get_curr_user, accessible_to
+from ..dependencies import get_curr_user, Rbac
 from ..db.db_conn import AsyncSession, get_async_session
 from typing import Sequence
 
@@ -32,9 +32,9 @@ async def get_products(skip: int = Query(0), limit: int = Query(None, max=100, m
     return (await session.scalars(q)).all() 
 
 
-@router.post('/', dependencies=[Depends(accessible_to([Role.DEVELOPER, Role.MERCHANT]))] ,status_code=status.HTTP_201_CREATED,  response_model=ProductRead,responses={ status.HTTP_409_CONFLICT: {"model": Message()} }, 
+@router.post('/', dependencies=[ Depends(get_curr_user), Depends(Rbac(role=[Role.DEVELOPER, Role.MERCHANT]).accessible_to)] ,status_code=status.HTTP_201_CREATED,  response_model=ProductRead,responses={ status.HTTP_409_CONFLICT: {"model": Message()} }, 
 )
-async def add_new_prod( user: User = Depends(get_curr_user) ,new_product: ProductCreate =  Body(example=ProductCreate(name="Product name", price=9999.99,description="product description" ,discount=10, cat=Cat.SHIIRT, thumbnail='product_thumbnail.jpg', amt_left=5, gallery=['second_img.jpg', 'first_img.jpg'], created_at=datetime.now() )), session: AsyncSession = Depends(get_async_session)): 
+async def add_new_prod(new_product: ProductCreate =  Body(example=ProductCreate(name="Product name", price=9999.99,description="product description" ,discount=10, cat=Cat.SHIIRT, thumbnail='product_thumbnail.jpg', amt_left=5, gallery=['second_img.jpg', 'first_img.jpg'], created_at=datetime.now() )), session: AsyncSession = Depends(get_async_session)): 
     fetched_cat = await get_category_by_name(new_product.cat) 
     product = Product(**new_product.model_dump(exclude_unset=True), cat=fetched_cat)
     session.add(product) 
@@ -63,7 +63,7 @@ async def get_products_group_by_cat(session: AsyncSession = Depends(get_async_se
     return (await session.execute(q)).all()
 
 #TODO: For admins and merchants only
-@router.patch('/{id}' , status_code=status.HTTP_200_OK)
+@router.patch('/{id}' , dependencies=[ Depends(get_curr_user), Depends(Rbac(role=[Role.DEVELOPER, Role.MERCHANT]).accessible_to)], status_code=status.HTTP_200_OK)
 async def update_product(id: int, session: AsyncSession = Depends(get_async_session), prod_updates: ProductUpdate = Body(...)) -> bool:
     if not prod_updates: 
         raise HTTPException(status_code=400, detail="You must update at least a field")
@@ -75,7 +75,7 @@ async def update_product(id: int, session: AsyncSession = Depends(get_async_sess
     return True 
 
 # TODO: For admins and merchants only
-@router.delete('/{id}', status_code=status.HTTP_204_NO_CONTENT)
+@router.delete('/{id}',dependencies=[ Depends(get_curr_user), Depends(Rbac(role=[Role.DEVELOPER, Role.MERCHANT]).accessible_to)] ,status_code=status.HTTP_204_NO_CONTENT)
 async def delete_product(id: int, session: AsyncSession = Depends(get_async_session)) -> bool: 
     q =  delete(Product).where(Product.id == id) 
     res = await session.execute(q)
