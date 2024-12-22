@@ -8,6 +8,7 @@ class Role(str, Enum):
     ADMIN = 'admin'
     CUSTOMER = 'customer' 
     DEVELOPER = 'developer'
+    MERCHANT = 'merchant'
 
 class Cat(str, Enum): 
     SHIIRT = "shirt"
