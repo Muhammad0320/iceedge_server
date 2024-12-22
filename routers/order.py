@@ -22,11 +22,11 @@ async def get_order_or_404(id: int, session: AsyncSession = Depends(get_async_se
     return result
 
 async def get_user_orders_or_404(id: int, session: AsyncSession = Depends(get_async_session)): 
-    result = (await session.scalars(select(Order).where(Order.customer == id).options(joinedload(Order.order_items)))).all() 
+    result = (await session.scalars(select(Order).where(Order.customer_id == id).options(joinedload(Order.order_items)))).all() 
     if not result: 
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Order not found')
     return result
-      
+  
 @router.get('/items/{id}', response_model=OrderItem) 
 async def get_item_by_id(item: OrderItem = Depends(get_item_or_404), session: AsyncSession = Depends(get_async_session)):
     return item
@@ -43,6 +43,7 @@ async def get_all_items(session: AsyncSession = Depends(get_async_session)):
 async def get_items_by_order( order: Order = Depends(get_order_or_404)): 
     return order 
 
+@router.get('/my_orders' )
 
 # TODO: Only admin and developer
 @router.get('/',  dependencies=[ Depends(get_curr_user), Depends(Rbac(role=[Role.DEVELOPER, Role.MERCHANT]).accessible_to)],response_model=list[OrderItem])
@@ -53,3 +54,8 @@ async def get_all_order(session: AsyncSession = Depends(get_async_session)):
 @router.get('/user/{id}')
 async def get_order_by_user(order = Depends(get_user_orders_or_404)): 
     return order
+
+@router.get('/my_orders')
+async def get_current_users_orders(user: User = Depends(get_curr_user)): 
+    results = await get_user_orders_or_404(user.id) 
+    return  results
