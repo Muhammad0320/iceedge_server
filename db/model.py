@@ -100,6 +100,8 @@ class Item(Base):
     quantity: Mapped[int] = mapped_column(Integer, default=1) 
     product_id: Mapped[int] = mapped_column(ForeignKey('products.id')) 
     product: Mapped['Product'] = relationship("Product", lazy='joined') 
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now) 
+
 
 class OrderItem(Item):
     __tablename__="order_items"
