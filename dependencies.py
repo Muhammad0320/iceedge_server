@@ -21,10 +21,23 @@ async def get_curr_user(token: str = Depends(APIKeyCookie(name=TOKEN_COOKIE_NAME
     return user
 
  
-async def role_is_in(role: list[Role], user: User) -> bool: 
-    if not user.role in role: 
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
-    return True 
 
-async def accessible_to(role: list[Role], user: User = Depends(get_curr_user)) -> bool:
-    return ( await role_is_in(role, user) )
+async def accessible_to(role: list[Role], user: User = Depends(get_curr_user)) :
+   async def role_is_in(role: list[Role], user: User):
+        if not user.role in role: 
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
+        return None  
+
+class Rbac:
+    def __init__(self, role: list[Role]): 
+        self.role = role 
+        
+        
+    async def role_is_in(self, user: User = Depends(get_curr_user)):
+        if not user.role in self.role: 
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
+        return None
+    
+    async def accessible_to(self): 
+        return (await self.role_is_in())
+    
