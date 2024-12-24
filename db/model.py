@@ -59,7 +59,8 @@ class User(Base):
     shipping_address: Mapped[ Optional[str]] = mapped_column(Text) 
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now) 
     orders: Mapped[Optional[List["Order"]]] = relationship("Order", cascade='all, delete')
-    reviews: Mapped['Review']  = relationship(back_populates='user')
+    reviews: Mapped[Optional['Review']]  = relationship(back_populates='user')
+
 
 class Review(Base): 
     __tablename__ = 'reviews'

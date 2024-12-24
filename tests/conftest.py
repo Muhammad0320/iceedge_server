@@ -1,10 +1,11 @@
-from fastapi import status 
+from fastapi import status, Depends
 from fastapi.testclient import TestClient
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine, async_sessionmaker
 import pytest_asyncio
 from ..main import app
 from ..db.db_conn import get_async_session
-from ..db.model import Base
+from ..db.model import Base, User
+from ..db.schema import Role
 import pytest
 
 TEST_DB_URL='sqlite+aiosqlite:///:memory:'
@@ -15,6 +16,14 @@ async def get_test_session():
     async with async_session() as session: 
         yield session
 
+async def get_fake_user_by_role(role: Role = Role.CUSTOMER):
+    async def get_fake_user(session: AsyncSession = Depends(get_test_session)): 
+        user = User(firstname="Muhammad", lastname='lastname', role=role, email='lisanalgaib@gmail.com', password='password1234')
+        session.add(user) 
+        await session.commit() 
+        return user 
+    return get_fake_user
+    
 
 @pytest_asyncio.fixture(scope='module', autouse=True) 
 async def prepare_db(): 
@@ -29,4 +38,3 @@ async def test_client():
     app.dependency_overrides[get_async_session] = get_test_session
     async with TestClient(app=app) as c: 
         yield c 
-
