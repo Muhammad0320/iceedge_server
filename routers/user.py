@@ -57,3 +57,4 @@ async def login(response: Response, email: str = Form(...), password: str = Form
 @router.get('/me', response_model=User)
 async def get_authenticated_user(user: User = Depends(get_curr_user)): 
     return user
+

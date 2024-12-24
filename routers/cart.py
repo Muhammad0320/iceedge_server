@@ -39,7 +39,6 @@ async def get_current_user_cart(user: User = Depends(get_curr_user)):
     result = await get_cart_by_user(user.id)
     return result 
 
-    
 # TODO: For developer only
 @router.get('/', dependencies=[ Depends(get_curr_user), Depends(Rbac(role=[Role.DEVELOPER, Role.MERCHANT]).accessible_to)])
 async def get_all_carts(session: AsyncSession = Depends(get_async_session)): 

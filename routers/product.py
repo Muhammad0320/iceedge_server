@@ -2,11 +2,11 @@ from fastapi import APIRouter, Depends, status, HTTPException, Body, Query, Path
 from sqlalchemy import select, update, delete, func
 from sqlalchemy.orm import joinedload
 from ..db.model import Category, Product, User 
-from ..db.schema import ProductCreate, ProductRead, ProductUpdate, Message, Cat, Role
 from datetime import datetime
 from ..dependencies import get_curr_user, Rbac
 from ..db.db_conn import AsyncSession, get_async_session
 from typing import Sequence
+from ..db.schema import ProductCreate, ProductRead, ProductUpdate, Message, Cat, Role
 
 router = APIRouter(prefix='/products', tags=['products'])
 
