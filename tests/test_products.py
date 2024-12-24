@@ -2,7 +2,7 @@ import pytest
 import pytest_asyncio
 import httpx
 from fastapi import status
-from .conftest import get_fake_user_by_role, Role
+from .conftest import TestUser, Role
 from ..main import app
 from ..routers.product import get_curr_user, Product ,ProductCreate, Cat
 
@@ -29,7 +29,7 @@ class TestCreateProduct:
         assert res.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
     
     async def test_create_valid(self, test_client: httpx.AsyncClient): 
-        app.dependency_overrides[get_curr_user] = get_fake_user_by_role(Role.DEVELOPER)
+        app.dependency_overrides[get_curr_user] = TestUser(Role.DEVELOPER).get_fake_user
         new_prod = {
             'name':'Black Hoodie', 'price':9999, 'discount':5, 'thumbnail':'thumbnail.png', 'gallery':['gallery_img_1.png', 'gallery_img_2.png'], 'amt_left':10, 'cat':Cat.SHIIRT, 'description':'Beautiful Hoodie'
         } 
