@@ -4,7 +4,7 @@ from sqlalchemy import DateTime, String, Text, Integer, Float, JSON, Enum, Forei
 from datetime import datetime
 from typing import List, Optional
 from datetime import timezone, timedelta
-
+from uuid import uuid4, UUID
 
 def get_expiration_date(duration_seconds: int = 86400) -> datetime:
     return datetime.now(tz=timezone.utc) + timedelta(seconds=duration_seconds)
@@ -50,7 +50,7 @@ class Product(Base):
 
 class User(Base): 
     __tablename__='users'
-    id: Mapped[int] = mapped_column(Integer, primary_key=True) 
+    id: Mapped[UUID] = mapped_column(default=uuid4, primary_key=True) 
     firstname: Mapped[str] = mapped_column(String(32)) 
     lastname: Mapped[str] = mapped_column(String(32))  
     role: Mapped[Role] = mapped_column(Enum(Role), default=Role.CUSTOMER) 
@@ -75,7 +75,7 @@ class Review(Base):
 
 class Order(Base): 
     __tablename__= "orders"
-    id: Mapped[int] = mapped_column(Integer, primary_key=True) 
+    id: Mapped[UUID] = mapped_column(default=uuid4, primary_key=True) 
     total: Mapped[float] = mapped_column(Integer) 
     quantity: Mapped[int] = mapped_column(Integer, default=1) 
     shipping_fee: Mapped[float] = mapped_column(Float) 
@@ -96,7 +96,7 @@ class Category(Base):
 class Item(Base): 
     # __tablename__= "items"
     id: Mapped[int] = mapped_column(Integer, primary_key=True) 
-    total: Mapped[float] = mapped_column(Float) 
+    unit_price: Mapped[float] = mapped_column(Float) 
     quantity: Mapped[int] = mapped_column(Integer, default=1) 
     product_id: Mapped[int] = mapped_column(ForeignKey('products.id')) 
     product: Mapped['Product'] = relationship("Product", lazy='joined') 
@@ -105,7 +105,7 @@ class Item(Base):
 
 class OrderItem(Item):
     __tablename__="order_items"
-    order_id: Mapped[Optional[int]] = mapped_column(ForeignKey('orders.id'), index=True)
+    order_id: Mapped[int] = mapped_column(ForeignKey('orders.id'), index=True)
 
 class CartItem(Item):
     __tablename__="cart_items"
