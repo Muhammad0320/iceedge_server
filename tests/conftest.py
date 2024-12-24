@@ -23,6 +23,16 @@ async def get_fake_user_by_role(role: Role = Role.CUSTOMER):
         await session.commit() 
         return user 
     return get_fake_user
+
+class TestUser(): 
+    def __init__(self, role: Role = Role.CUSTOMER): 
+       self.role = role 
+       
+    async def get_fake_user(self, session: AsyncSession = Depends(get_test_session)): 
+        user = User(firstname="Muhammad", lastname='lastname', role=self.role, email='lisanalgaib@gmail.com', password='password1234')
+        session.add(user) 
+        await session.commit() 
+        return user 
     
 
 @pytest_asyncio.fixture(scope='module', autouse=True) 
