@@ -85,7 +85,7 @@ class Order(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now) 
     customer_id: Mapped[int] = mapped_column(ForeignKey('user.id')) 
     customer: Mapped["User"] = relationship("User", back_populates="orders") 
-    order_items: Mapped[List['Item']] = relationship("Item") 
+    order_items: Mapped[List['OrderItem']] = relationship("Item") 
 
 
 class Category(Base): 
