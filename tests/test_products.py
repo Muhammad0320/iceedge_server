@@ -12,7 +12,7 @@ from ..routers.product import get_curr_user, Product ,ProductCreate, Cat
 class TestCreateProduct: 
     
     async def test_create_unauthorized(self, test_client: httpx.AsyncClient): 
-        new_prod = ProductCreate( name='Black Hoodie', price=9999, discount=5, thumbnail='thumbnail.png', gallery=['gallery_img_1.png', 'gallery_img_2.png'], amt_left=10, cat=Cat.SHIRT )
+        new_prod = {"name":'Black Hoodie', "price":9999, "discount":5, "thumbnail":'thumbnail.png', "gallery":['gallery_img_1.png', 'gallery_img_2.png'], "amt_left":10, "cat":Cat.SHIRT }
         res = await test_client.post('/products/', json=new_prod) 
         assert res.status_code == status.HTTP_401_UNAUTHORIZED
     

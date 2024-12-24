@@ -11,7 +11,7 @@ class Role(str, Enum):
     MERCHANT = 'merchant'
 
 class Cat(str, Enum): 
-    SHIIRT = "shirt"
+    SHIRT = "shirt"
     PANT = 'pant'
     CAP = 'cap'
     SHOE = 'shoe'
