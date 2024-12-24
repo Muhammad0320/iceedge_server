@@ -94,8 +94,17 @@ class Category(Base):
     name: Mapped[Cat] = mapped_column(Enum(Cat), unique=True, index=True) 
     products: Mapped[List["Product"]] = relationship(back_populates='cat')
 
-class Item(Base): 
-    # __tablename__= "items"
+# class Item(Base): 
+#     # __tablename__= "items"
+#     id: Mapped[int] = mapped_column(Integer, primary_key=True) 
+#     unit_price: Mapped[float] = mapped_column(Float) 
+#     quantity: Mapped[int] = mapped_column(Integer, default=1) 
+#     product_id: Mapped[int] = mapped_column(ForeignKey('products.id')) 
+#     product: Mapped['Product'] = relationship("Product", lazy='joined') 
+#     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now) 
+
+class OrderItem(Base):
+    __tablename__="order_items"
     id: Mapped[int] = mapped_column(Integer, primary_key=True) 
     unit_price: Mapped[float] = mapped_column(Float) 
     quantity: Mapped[int] = mapped_column(Integer, default=1) 
@@ -103,13 +112,16 @@ class Item(Base):
     product: Mapped['Product'] = relationship("Product", lazy='joined') 
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now) 
 
-
-class OrderItem(Item):
-    __tablename__="order_items"
     order_id: Mapped[int] = mapped_column(ForeignKey('orders.id'), index=True)
 
-class CartItem(Item):
+class CartItem(Base):
     __tablename__="cart_items"
+    id: Mapped[int] = mapped_column(Integer, primary_key=True) 
+    unit_price: Mapped[float] = mapped_column(Float) 
+    quantity: Mapped[int] = mapped_column(Integer, default=1) 
+    product_id: Mapped[int] = mapped_column(ForeignKey('products.id')) 
+    product: Mapped['Product'] = relationship("Product", lazy='joined') 
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now) 
     cart_id: Mapped[Optional[int]] = mapped_column(ForeignKey('carts.id'), index=True)
     cart: Mapped[Optional["Cart"]] = relationship(back_populates='cart_items')
 

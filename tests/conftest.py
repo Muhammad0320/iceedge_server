@@ -2,7 +2,7 @@ from fastapi import status, Depends
 from fastapi.testclient import TestClient
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine, async_sessionmaker
 import pytest_asyncio
-from main import app
+from ..main import app
 from ..db.db_conn import get_async_session
 from ..db.model import Base, User
 from ..db.schema import Role

@@ -1,6 +1,6 @@
 from collections.abc import AsyncGenerator
 from sqlalchemy.ext.asyncio import AsyncSession , create_async_engine, async_sessionmaker
-from .model import Base
+from  .model import Base
 
 DB_URL='sqlite+aiosqlite:///./iceedge.db'
 engine = create_async_engine(DB_URL) 
