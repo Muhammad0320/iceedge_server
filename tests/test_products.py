@@ -1,7 +1,7 @@
 import pytest
 import pytest_asyncio
 import httpx
-from fastapi import status
+from fastapi import status, HTTPException
 from .conftest import TestUser, Role
 from ..main import app
 from ..routers.product import get_curr_user, Product, Cat
@@ -47,4 +47,18 @@ class TestGetProduct:
     async def test_get_product_invalid_id(self, test_client: httpx.AsyncClient): 
         res = await test_client.get('/products/12')
         res.status_code == status.HTTP_404_NOT_FOUND
+    
+    async def test_get_product(self, test_client: httpx.AsyncClient): 
+        app.dependency_overrides[get_curr_user] = TestUser(Role.DEVELOPER).get_fake_user
+        new_prod = {
+            'name':'Black Hoodie', 'price':9999, 'discount':5, 'thumbnail':'thumbnail.png', 'gallery':['gallery_img_1.png', 'gallery_img_2.png'], 'amt_left':10, 'cat':Cat.SHIRT, 'description':'Beautiful Hoodie'
+        } 
+        product = await test_client.post('/products/', json=new_prod) 
+        assert product.status_code == status.HTTP_201_CREATED
+        data: Product | None = product.json() 
+        if not data: 
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST)
+        res = await test_client.get(f'/products/{data.id}')
+        res.status_code == status.HTTP_200_OK
+            
     
