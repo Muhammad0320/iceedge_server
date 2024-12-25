@@ -44,3 +44,7 @@ class TestGetProduct:
         res = await test_client.get('/prorducts/shit_password')
         assert res.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
     
+    async def test_get_product_invalid_id(self, test_client: httpx.AsyncClient): 
+        res = await test_client.get('/products/12')
+        res.status_code == status.HTTP_404_NOT_FOUND
+    
