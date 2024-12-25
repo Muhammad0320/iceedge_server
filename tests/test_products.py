@@ -113,7 +113,7 @@ class TestUpdateProduct:
         res = await test_client.patch(self.url, json={})
         assert res.status_code == status.HTTP_400_BAD_REQUEST
     
-    async def test_update_product_invalid_prod(self, test_client: httpx.AsyncClient): 
+    async def test_update_product_invalid_prod_id(self, test_client: httpx.AsyncClient): 
         app.dependency_overrides[get_curr_user] = TestUser(Role.DEVELOPER).get_fake_user
         res = await test_client.patch(self.url, json=self.payload)
         assert res.json() == False 
@@ -123,3 +123,28 @@ class TestUpdateProduct:
         data, _ = await create_new_prod(test_client)
         res = await test_client.patch(f'/products/{data.id}', json=self.payload) 
         assert res.json() == True
+
+@pytest.mark.asyncio 
+class TestDeleteProduct: 
+    def __init__(self): 
+        self.url = '/product/1'
+    
+    async def test_delete_product_unauthenticated(self, test_client: httpx.AsyncClient): 
+        res = await test_client.delete(self.url)
+        assert res.status_code == status.HTTP_401_UNAUTHORIZED
+    
+    async def test_delete_product_forbidden(self, test_client: httpx.AsyncClient): 
+        app.dependency_overrides[get_curr_user] = TestUser(Role.CUSTOMER).get_fake_user
+        res = await test_client.delete(self.url)
+        assert res.status_code == status.HTTP_403_FORBIDDEN
+    
+    async def test_delete_product_invalid_prod_id(self, test_client: httpx.AsyncClient): 
+        app.dependency_overrides[get_curr_user] = TestUser(Role.DEVELOPER).get_fake_user
+        res = await test_client.delete(self.url)
+        assert res.json() == False 
+    
+    async def test_delete_product_valid(self, test_client: httpx.AsyncClient): 
+        app.dependency_overrides[get_curr_user] = TestUser(Role.DEVELOPER).get_fake_user
+        data, _ = await create_new_prod(test_client)
+        res = await test_client.delete(f'/products/{data.id}')
+        assert res.json() == True 
