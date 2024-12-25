@@ -4,8 +4,7 @@ import httpx
 from fastapi import status
 from .conftest import TestUser, Role
 from ..main import app
-from ..routers.product import get_curr_user, Product ,ProductCreate, Cat
-
+from ..routers.product import get_curr_user, Product, Cat
 
 
 @pytest.mark.asyncio 
@@ -38,4 +37,10 @@ class TestCreateProduct:
         data: Product | None = res.json() 
         if data: 
             assert data.name == new_prod['name']
-        
+ 
+@pytest.mark.asyncio   
+class TestGetProduct:
+    async def test_get_product_invalid_format(self, test_client: httpx.AsyncClient): 
+        res = await test_client.get('/prorducts/shit_password')
+        assert res.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+    
