@@ -34,7 +34,7 @@ async def get_products(skip: int = Query(0), limit: int = Query(None, max=100, m
 
 @router.post('/', dependencies=[ Depends(get_curr_user), Depends(Rbac(role=[Role.DEVELOPER, Role.MERCHANT]).accessible_to)] ,status_code=status.HTTP_201_CREATED,  response_model=ProductRead,responses={ status.HTTP_409_CONFLICT: {"model": Message()} }, 
 )
-async def add_new_prod(new_product: ProductCreate =  Body(example=ProductCreate(name="Product name", price=9999.99,description="product description" ,discount=10, cat=Cat.SHIIRT, thumbnail='product_thumbnail.jpg', amt_left=5, gallery=['second_img.jpg', 'first_img.jpg'], created_at=datetime.now() )), session: AsyncSession = Depends(get_async_session)): 
+async def add_new_prod(new_product: ProductCreate =  Body(example=ProductCreate(name="Product name", price=9999.99,description="product description" ,discount=10, cat=Cat.SHIRT, thumbnail='product_thumbnail.jpg', amt_left=5, gallery=['second_img.jpg', 'first_img.jpg'], created_at=datetime.now() )), session: AsyncSession = Depends(get_async_session)): 
     fetched_cat = await get_category_by_name(new_product.cat) 
     product = Product(**new_product.model_dump(exclude_unset=True), cat=fetched_cat)
     session.add(product) 
@@ -52,7 +52,7 @@ async def get_product_by_id(product: Product = Depends(get_product_or_404)):
     return product
 
 @router.get('/{cat}')
-async def get_products_by_category(cat: Cat = Query(example=Cat.SHIIRT), session: AsyncSession = Depends(get_async_session)): 
+async def get_products_by_category(cat: Cat = Query(example=Cat.SHIRT), session: AsyncSession = Depends(get_async_session)): 
     # category = await get_category_by_name(cat)
     q = select(Product, Category.name).join(Product.cat, onclause=Product.cat_id == Category.id) 
     return (await session.scalars(q)).all()      
