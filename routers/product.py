@@ -66,7 +66,7 @@ async def get_products_group_by_cat(session: AsyncSession = Depends(get_async_se
 @router.patch('/{id}' , dependencies=[ Depends(get_curr_user), Depends(Rbac(role=[Role.DEVELOPER, Role.MERCHANT]).accessible_to)], status_code=status.HTTP_200_OK)
 async def update_product(id: int,  prod_updates: ProductUpdate = Body(...), session: AsyncSession = Depends(get_async_session)) -> bool:
     if not prod_updates: 
-        raise HTTPException(status_code=400, detail="You must update at least a field")
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="You must update at least a field")
     q =  update(Product).where(Product.id == id).values(**prod_updates.model_dump( exclude_unset=True ))
     res = await session.execute(q)
     await session.commit() 
