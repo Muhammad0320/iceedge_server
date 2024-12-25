@@ -58,13 +58,13 @@ class TestGetProduct:
     
     async def test_get_product_invalid_id(self, test_client: httpx.AsyncClient): 
         res = await test_client.get('/products/12')
-        res.status_code == status.HTTP_404_NOT_FOUND
+        assert res.status_code == status.HTTP_404_NOT_FOUND
     
     async def test_get_product(self, test_client: httpx.AsyncClient): 
         app.dependency_overrides[get_curr_user] = TestUser(Role.DEVELOPER).get_fake_user
         data, _ = await create_new_prod(test_client)
         res = await test_client.get(f'/products/{data.id}')
-        res.status_code == status.HTTP_200_OK
+        assert res.status_code == status.HTTP_200_OK
 
 @pytest.mark.asyncio 
 class TestGetProdByCat: 
@@ -72,13 +72,13 @@ class TestGetProdByCat:
         app.dependency_overrides[get_curr_user] = TestUser(Role.DEVELOPER).get_fake_user
         await create_new_prod(test_client) 
         res = await test_client.get('/products/boxer')
-        res.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+        assert res.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
     
     async def test_get_prod_valid(self, test_client: httpx.AsyncClient): 
         app.dependency_overrides[get_curr_user] = TestUser(Role.DEVELOPER).get_fake_user
         await create_new_prod(test_client) 
         res = await test_client.get('/products/shirt')
-        res.status_code == status.HTTP_200_OK
+        assert res.status_code == status.HTTP_200_OK
 
 @pytest.mark.asyncio
 class TestGroupProdByCat: 
@@ -90,5 +90,36 @@ class TestGroupProdByCat:
         await create_new_prod(test_client, cat=Cat.CAP, name='Navyblue cap')
         await create_new_prod(test_client, cat=Cat.SHOE, name='Soft shoe')
         await create_new_prod(test_client, cat=Cat.SOCK, name='White sock')
-        res = await res.get('/products/group_by_cat')
-        res.status_code == status.HTTP_200_OK
+        res = await test_client.get('/products/group_by_cat')
+        assert res.status_code == status.HTTP_200_OK
+
+@pytest.mark.asyncio 
+class TestUpdateProduct:
+    def __init__(self): 
+        self.payload = {'price':65000.99}
+        self.url = '/product/1'
+
+    async def test_update_product_unauthenticated(self, test_client: httpx.AsyncClient): 
+        res = await test_client.patch(self.url, json=self.payload)
+        assert res.status_code == status.HTTP_401_UNAUTHORIZED
+    
+    async def test_update_product_forbidden(self, test_client: httpx.AsyncClient): 
+        app.dependency_overrides[get_curr_user] = TestUser(Role.CUSTOMER).get_fake_user
+        res = await test_client.patch(self.url, json=self.payload)
+        assert res.status_code == status.HTTP_403_FORBIDDEN
+    
+    async def test_update_product_no_update(self, test_client: httpx.AsyncClient): 
+        app.dependency_overrides[get_curr_user] = TestUser(Role.DEVELOPER).get_fake_user
+        res = await test_client.patch(self.url, json={})
+        assert res.status_code == status.HTTP_400_BAD_REQUEST
+    
+    async def test_update_product_invalid_prod(self, test_client: httpx.AsyncClient): 
+        app.dependency_overrides[get_curr_user] = TestUser(Role.DEVELOPER).get_fake_user
+        res = await test_client.patch(self.url, json=self.payload)
+        assert res.json() == False 
+    
+    async def test_update_product_valid(self, test_client: httpx.AsyncClient): 
+        app.dependency_overrides[get_curr_user] = TestUser(Role.DEVELOPER).get_fake_user
+        data, _ = await create_new_prod(test_client)
+        res = await test_client.patch(f'/products/{data.id}', json=self.payload) 
+        assert res.json() == True
