@@ -16,7 +16,7 @@ async def create_new_prod(test_client: httpx.AsyncClient):
         data: Product | None = product.json() 
         if not data: 
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST)
-        return data
+        return data, new_prod
 
 @pytest.mark.asyncio 
 class TestCreateProduct: 
@@ -40,20 +40,15 @@ class TestCreateProduct:
     
     async def test_create_valid(self, test_client: httpx.AsyncClient): 
         app.dependency_overrides[get_curr_user] = TestUser(Role.DEVELOPER).get_fake_user
-        new_prod = {
-            'name':'Black Hoodie', 'price':9999, 'discount':5, 'thumbnail':'thumbnail.png', 'gallery':['gallery_img_1.png', 'gallery_img_2.png'], 'amt_left':10, 'cat':Cat.SHIRT, 'description':'Beautiful Hoodie'
-        } 
-        res = await test_client.post('/products/', json=new_prod) 
-        assert res.status_code == status.HTTP_201_CREATED
-        data: Product | None = res.json() 
-        if data: 
-            assert data.name == new_prod['name']
+        data, new_prod = await create_new_prod(test_client)
+        assert data.name == new_prod['name']
  
 
 @pytest.mark.asyncio
 async def test_get_all_products(test_client: httpx.AsyncClient): 
+    _, _ = await create_new_prod(test_client) 
     res = await test_client.get('/products')
-    
+    res.status_code == status.HTTP_200_OK    
 
 @pytest.mark.asyncio   
 class TestGetProduct:
@@ -67,6 +62,7 @@ class TestGetProduct:
     
     async def test_get_product(self, test_client: httpx.AsyncClient): 
         app.dependency_overrides[get_curr_user] = TestUser(Role.DEVELOPER).get_fake_user
+        data, _ = await create_new_prod(test_client)
         res = await test_client.get(f'/products/{data.id}')
         res.status_code == status.HTTP_200_OK
 
