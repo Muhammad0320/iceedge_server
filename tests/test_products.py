@@ -7,9 +7,9 @@ from ..main import app
 from ..routers.product import get_curr_user, Product, Cat
 
 
-async def create_new_prod(test_client: httpx.AsyncClient): 
+async def create_new_prod(test_client: httpx.AsyncClient, cat: Cat = Cat.SHIRT, name: str = 'Black Hoodie'): 
         new_prod = {
-            'name':'Black Hoodie', 'price':9999, 'discount':5, 'thumbnail':'thumbnail.png', 'gallery':['gallery_img_1.png', 'gallery_img_2.png'], 'amt_left':10, 'cat':Cat.SHIRT, 'description':'Beautiful Hoodie'
+            'name':name, 'price':9999, 'discount':5, 'thumbnail':'thumbnail.png', 'gallery':['gallery_img_1.png', 'gallery_img_2.png'], 'amt_left':10, 'cat':cat, 'description':'Beautiful Hoodie'
         } 
         product = await test_client.post('/products/', json=new_prod) 
         assert product.status_code == status.HTTP_201_CREATED
@@ -46,7 +46,7 @@ class TestCreateProduct:
 
 @pytest.mark.asyncio
 async def test_get_all_products(test_client: httpx.AsyncClient): 
-    _, _ = await create_new_prod(test_client) 
+    await create_new_prod(test_client) 
     res = await test_client.get('/products')
     res.status_code == status.HTTP_200_OK    
 
@@ -66,3 +66,29 @@ class TestGetProduct:
         res = await test_client.get(f'/products/{data.id}')
         res.status_code == status.HTTP_200_OK
 
+@pytest.mark.asyncio 
+class TestGetProdByCat: 
+    async def test_get_prod_invalid_cat(self, test_client: httpx.AsyncClient):
+        app.dependency_overrides[get_curr_user] = TestUser(Role.DEVELOPER).get_fake_user
+        await create_new_prod(test_client) 
+        res = await test_client.get('/products/boxer')
+        res.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+    
+    async def test_get_prod_valid(self, test_client: httpx.AsyncClient): 
+        app.dependency_overrides[get_curr_user] = TestUser(Role.DEVELOPER).get_fake_user
+        await create_new_prod(test_client) 
+        res = await test_client.get('/products/shirt')
+        res.status_code == status.HTTP_200_OK
+
+@pytest.mark.asyncio
+class TestGroupProdByCat: 
+    async def test_get_group_product(self, test_client: httpx.AsyncClient): 
+        app.dependency_overrides[get_curr_user] = TestUser(Role.DEVELOPER).get_fake_user
+        await create_new_prod(test_client)
+        await create_new_prod(test_client, cat=Cat.PANT, name='Brown pant')
+        await create_new_prod(test_client, cat=Cat.MASK, name='Blue Mask')
+        await create_new_prod(test_client, cat=Cat.CAP, name='Navyblue cap')
+        await create_new_prod(test_client, cat=Cat.SHOE, name='Soft shoe')
+        await create_new_prod(test_client, cat=Cat.SOCK, name='White sock')
+        res = await res.get('/products/group_by_cat')
+        res.status_code == status.HTTP_200_OK

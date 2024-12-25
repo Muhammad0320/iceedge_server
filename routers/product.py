@@ -53,8 +53,8 @@ async def get_product_by_id(product: Product = Depends(get_product_or_404)):
 
 @router.get('/{cat}')
 async def get_products_by_category(cat: Cat = Query(example=Cat.SHIRT), session: AsyncSession = Depends(get_async_session)): 
-    # category = await get_category_by_name(cat)
-    q = select(Product, Category.name).join(Product.cat, onclause=Product.cat_id == Category.id) 
+    category = await get_category_by_name(cat)
+    q = select(Product).where(Product.cat_id == category.id)
     return (await session.scalars(q)).all()      
 
 @router.get('/group_by_cat')
@@ -64,7 +64,7 @@ async def get_products_group_by_cat(session: AsyncSession = Depends(get_async_se
 
 #TODO: For admins and merchants only
 @router.patch('/{id}' , dependencies=[ Depends(get_curr_user), Depends(Rbac(role=[Role.DEVELOPER, Role.MERCHANT]).accessible_to)], status_code=status.HTTP_200_OK)
-async def update_product(id: int, session: AsyncSession = Depends(get_async_session), prod_updates: ProductUpdate = Body(...)) -> bool:
+async def update_product(id: int,  prod_updates: ProductUpdate = Body(...), session: AsyncSession = Depends(get_async_session)) -> bool:
     if not prod_updates: 
         raise HTTPException(status_code=400, detail="You must update at least a field")
     q =  update(Product).where(Product.id == id).values(**prod_updates.model_dump( exclude_unset=True ))
