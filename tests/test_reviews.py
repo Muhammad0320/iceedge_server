@@ -19,12 +19,16 @@ async def create_new_prod(test_client: httpx.AsyncClient, cat: Cat = Cat.SHIRT, 
         return data, new_prod
 
 
-
+@pytest_asyncio.fixture(scope='module', autouse=True)
+async def create_test_product(test_client: httpx.AsyncClient): 
+    product, _ = await create_new_prod(test_client)
+    return product 
+    
 class TestCreateReview: 
     def __init__(self): 
         self.url = '/reviews/'
     
-    async def test_unauthenticated(self, test_client: httpx.AsyncClient): 
-        
-        payload = {"content": "Tested and trusted", "rating": 5.0, 'user_id': 123, 'product_id': 123  }
+    async def test_unauthenticated(self, test_client: httpx.AsyncClient, product: create_test_product): 
+        prod, _ = product
+        payload = {"content": "Tested and trusted", "rating": 5.0,  'product_id':prod.id   }
         

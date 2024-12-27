@@ -33,7 +33,8 @@ async def get_reviews_by_prod(id: int, session: AsyncSession = Depends(get_async
     return res 
 
 @router.post('/', dependencies=[Depends(get_curr_user)] ,response_model=ReviewRead, status_code=status.HTTP_201_CREATED)
-async def create_post(new_review: ReviewCreate = Body(example=ReviewCreate(content="The best", rating=5.0, product_id=999)), session: AsyncSession = Depends(get_async_session)): 
+async def create_post(user: User, new_review: ReviewCreate = Body(example=ReviewCreate(content="The best", rating=5.0, product_id=999)), session: AsyncSession = Depends(get_async_session)): 
+    new_review.user_id = user.id 
     review = Review(**new_review.model_dump(exclude_unset=True))
     session.add(review)
     await session.commit() 

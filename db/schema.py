@@ -1,7 +1,9 @@
 from pydantic import BaseModel, EmailStr, model_validator, Field
 from datetime import datetime
 from enum import Enum 
+from typing import Optional
 from typing_extensions import Self
+from uuid import UUID
 
 
 class Role(str, Enum): 
@@ -102,6 +104,7 @@ class ReviewBase(BaseModel):
 
 class ReviewCreate(ReviewBase): 
     pass 
+    user_id: Optional[UUID] = None
 
 class ReviewRead(ReviewBase): 
     id: int 
