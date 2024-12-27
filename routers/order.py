@@ -5,6 +5,7 @@ from sqlalchemy import select, update, delete
 from sqlalchemy.orm import joinedload
 from ..dependencies import get_curr_user, Rbac
 from ..db.schema import Role 
+from uuid import UUID
 # from .product import get_product_or_404
 
 router = APIRouter(prefix='/order', tags=['order', 'item'])
@@ -21,7 +22,7 @@ async def get_order_or_404(id: int, session: AsyncSession = Depends(get_async_se
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Order not found')
     return result
 
-async def get_user_orders_or_404(id: int, session: AsyncSession = Depends(get_async_session)): 
+async def get_user_orders_or_404(id: UUID, session: AsyncSession = Depends(get_async_session)): 
     result = (await session.scalars(select(Order).where(Order.customer_id == id).options(joinedload(Order.order_items)))).all() 
     if not result: 
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Order not found')

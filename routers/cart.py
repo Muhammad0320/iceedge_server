@@ -5,10 +5,11 @@ from sqlalchemy import select, update, delete
 from sqlalchemy.orm import joinedload
 from ..db.schema import  ItemUpdate
 from ..dependencies import get_curr_user, Rbac, Role
+from uuid import UUID
 
 router = APIRouter(prefix='/cart', tags=['cart', 'item'])
 
-async def get_cart_by_user(id: int, session: AsyncSession = Depends(get_async_session)): 
+async def get_cart_by_user(id: UUID, session: AsyncSession = Depends(get_async_session)): 
     q = select(Cart).where(Cart.user_id == id).order_by(Cart.created_at)
     result = (await session.execute(q)).one_or_none()
     if not result: 

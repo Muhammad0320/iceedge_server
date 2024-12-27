@@ -16,9 +16,6 @@ from ..dependencies import get_curr_user
 router = APIRouter(prefix='/user', tags=['users', 'authentication']) 
 
 
-
-
-
 @router.post('/register', response_model=UserRead)
 async def register_user(user: UserCreate, session: AsyncSession = Depends(get_async_session)): 
     hashed_password = hash_password(user.password)
