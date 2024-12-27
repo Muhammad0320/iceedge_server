@@ -1,11 +1,20 @@
 from fastapi import APIRouter, Depends, status, Body, HTTPException, Path
-from ..db.schema import ReviewCreate, ReviewRead, ReviewUpdate
+from ..db.schema import ReviewCreate, ReviewRead, ReviewUpdate, Role
 from ..db.db_conn import AsyncSession, get_async_session
-from ..db.model import Review, Product
+from ..db.model import Review, Product, User
 from sqlalchemy import select, update, delete, func 
 from .product import get_product_or_404
 
 router = APIRouter(prefix='/review', tags=['reviews'])
+
+async def check_if_mine(id: int, user: User, session: AsyncSession = Depends(get_async_session)): 
+    review = await session.get(Review, id)
+    if not review: 
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+    if (review.user_id != user.id) and user.role not in [Role.DEVELOPER, Role.ADMIN]: 
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail='You can only modify your own review')
+    return review
+
 
 async def get_review_or_404(id: int, session: AsyncSession = Depends(get_async_session)): 
     result = (await session.scalars(select(Review).where(Review.id == id))).one_or_none() 

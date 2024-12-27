@@ -70,8 +70,9 @@ class Review(Base):
     num_marked_useful: Mapped[int] = mapped_column(Integer, default=0) 
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now) 
     product_id: Mapped[int] = mapped_column(ForeignKey('products.id'), index=True)  
+    user_id: Mapped[UUID] = mapped_column(ForeignKey('users.id'), index=True)
     user: Mapped['User'] = relationship(back_populates='reviews')
-    product: Mapped["Product"] = relationship("Product", back_populates='reviews') 
+    product: Mapped["Product"] = relationship( back_populates='reviews') 
     
 
 class Order(Base): 
