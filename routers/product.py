@@ -20,11 +20,11 @@ async def get_prods_by_cat(cat: Cat, session: AsyncSession = Depends(get_async_s
     q = select(Product, Category.name).where(Product.cat_id == cat_id).join(Product.cat).order_by(Product.created_at).options(joinedload(Product.cat))
     return (await session.scalars(q)).all() 
 
-async def get_product_or_404(id: int, session: AsyncSession = Depends(get_async_session)) -> Product : 
+async def get_product_or_404(id: int, session: AsyncSession = Depends(get_async_session)) -> Product | None : 
     q = select(Product, Category.name).where(Product.id == id).options(joinedload(Product.cat))
     res = (await session.execute(q)).scalar_one_or_none() 
     if not res: 
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Product not found") 
+        return None  
     return res
     
 async def get_products(skip: int = Query(0), limit: int = Query(None, max=100, min=1), session: AsyncSession = Depends(get_async_session)):
