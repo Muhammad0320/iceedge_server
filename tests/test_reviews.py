@@ -28,7 +28,7 @@ class TestCreateReview:
     def __init__(self): 
         self.url = '/reviews/'
     
-    async def test_unauthenticated(self, test_client: httpx.AsyncClient, product: create_test_product): 
-        prod, _ = product
-        payload = {"content": "Tested and trusted", "rating": 5.0,  'product_id':prod.id   }
-        
+    async def test_unauthenticated(self, test_client: httpx.AsyncClient, product: Product): 
+        payload = {"content": "Tested and trusted", "rating": 5.0,  'product_id': product.id   }
+        result = await test_client.post(self.url, json=payload)
+        assert result.status_code == status.HTTP_401_UNAUTHORIZED
