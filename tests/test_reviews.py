@@ -71,3 +71,14 @@ async def create_test_review(test_client: httpx.AsyncClient, product: Product):
     if not review: 
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST)
     return review
+
+
+class TestGetOnewReview: 
+    def __init__(self): 
+        self.url = '/reviews/'
+        
+    async def test_get_one(self, test_client: httpx.AsyncClient, review: Review): 
+        result = await test_client.get(f"{self.url}/{review.id}")
+        result.status_code == status.HTTP_200_OK
+    
+    
