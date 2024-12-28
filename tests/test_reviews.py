@@ -73,12 +73,21 @@ async def create_test_review(test_client: httpx.AsyncClient, product: Product):
     return review
 
 
-class TestGetOnewReview: 
+class TestGetOneReview: 
     def __init__(self): 
         self.url = '/reviews/'
         
     async def test_get_one(self, test_client: httpx.AsyncClient, review: Review): 
-        result = await test_client.get(f"{self.url}/{review.id}")
+        result = await test_client.get(f"{self.url}{review.id}")
         result.status_code == status.HTTP_200_OK
+
+class TestUpdateReview: 
+    def __init__(self): 
+        self.url = '/reviews/'
     
-    
+    async def test_unauthorized(self, test_client: httpx.AsyncClient, review: Review):
+        updates = {"rating": 4.5}
+        result = await test_client.patch(f"{self.url}{review.id}", json=updates) 
+        assert result.status_code == status.HTTP_401_UNAUTHORIZED
+        
+        
