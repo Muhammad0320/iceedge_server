@@ -54,3 +54,10 @@ class TestCreateReview:
         result2 = await test_client.post(self.url, json=payload) 
         result2.status_code == status.HTTP_409_CONFLICT
     
+    async def test_create_review(self, test_client: httpx.AsyncClient, product: Product): 
+        app.dependency_overrides[get_curr_user] = TestUser(Role.CUSTOMER).get_fake_user 
+        payload = {"content": "Tested and trusted", "rating": 5.0,  'product_id': product.id   }
+        result = await test_client.post(self.url, json=payload)
+        result.status_code == status.HTTP_201_CREATED
+    
+    
