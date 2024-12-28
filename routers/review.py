@@ -39,7 +39,7 @@ async def create_post(user: User, new_review: ReviewCreate = Body(...,example=Re
     new_review.user_id = user.id 
     product_purchase = await check_if_user_purchase_prod(user.id, new_review.product_id, session) 
     if not product_purchase: 
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, status='You havr to purchase this product first')
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='You havr to purchase this product first')
     review = Review(**new_review.model_dump(exclude_unset=True))
     try: 
         session.add(review)
