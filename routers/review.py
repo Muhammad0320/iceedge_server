@@ -5,6 +5,7 @@ from ..db.model import Review, Product, User
 from sqlalchemy import select, update, delete, func 
 from .product import get_product_or_404
 from .user import get_curr_user
+from sqlalchemy.exc import IntegrityError
 
 router = APIRouter(prefix='/review', tags=['reviews'])
 
@@ -36,14 +37,18 @@ async def get_reviews_by_prod(id: int, session: AsyncSession = Depends(get_async
 async def create_post(user: User, new_review: ReviewCreate = Body(example=ReviewCreate(content="The best", rating=5.0, product_id=999)), session: AsyncSession = Depends(get_async_session)): 
     new_review.user_id = user.id 
     review = Review(**new_review.model_dump(exclude_unset=True))
-    session.add(review)
-    await session.commit() 
-    return review
+    try: 
+        session.add(review)
+        await session.commit() 
+        return review
+    except IntegrityError: 
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail='Review already exist')
 
 @router.get('/{id}', response_model=ReviewRead)
 async def get_review(review: Review = Depends(get_review_or_404)): 
     return review
-
+  
+  
 @router.patch('/{id}', dependencies=[Depends(get_curr_user), Depends(check_if_mine)])
 async def update_review(id: int = Path(...), updates: ReviewUpdate = Body(example=ReviewUpdate(rating=5.0, content='new rating')), session: AsyncSession = Depends(get_async_session)): 
     if not updates: 
