@@ -4,6 +4,7 @@ from ..db.db_conn import AsyncSession, get_async_session
 from ..db.model import Review, Product, User
 from sqlalchemy import select, update, delete, func 
 from .product import get_product_or_404
+from .order import check_if_user_purchase_prod
 from .user import get_curr_user
 from sqlalchemy.exc import IntegrityError
 
@@ -34,8 +35,11 @@ async def get_reviews_by_prod(id: int, session: AsyncSession = Depends(get_async
     return res 
 
 @router.post('/', dependencies=[Depends(get_curr_user)] ,response_model=ReviewRead, status_code=status.HTTP_201_CREATED)
-async def create_post(user: User, new_review: ReviewCreate = Body(example=ReviewCreate(content="The best", rating=5.0, product_id=999)), session: AsyncSession = Depends(get_async_session)): 
+async def create_post(user: User, new_review: ReviewCreate = Body(...,example=ReviewCreate(content="The best", rating=5.0, product_id=999)), session: AsyncSession = Depends(get_async_session)): 
     new_review.user_id = user.id 
+    product_purchase = await check_if_user_purchase_prod(user.id, new_review.product_id, session) 
+    if not product_purchase: 
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, status='You havr to purchase this product first')
     review = Review(**new_review.model_dump(exclude_unset=True))
     try: 
         session.add(review)
