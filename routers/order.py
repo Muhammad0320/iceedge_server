@@ -16,6 +16,14 @@ async def get_item_or_404(id: int, session: AsyncSession = Depends(get_async_ses
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Order item not found')
     return result
 
+async def check_if_user_purchase_prod(customer_id: UUID, prod_id: int, session: AsyncSession = Depends(get_async_session)): 
+    q = select(Order).where(Order.customer_id == customer_id).join(Order.order_items).where(OrderItem.product_id == prod_id).order_by(Order.created_at)
+    result = (await session.scalars(q)).one_or_none()
+    if not result: 
+        return False 
+    return result
+    
+
 async def get_order_or_404(id: int, session: AsyncSession = Depends(get_async_session)) -> Order: 
     result = (await session.scalars(select(Order, OrderItem ).where(Order.id == id).options(joinedload(Order.order_items)))).one_or_none() 
     if not result: 
