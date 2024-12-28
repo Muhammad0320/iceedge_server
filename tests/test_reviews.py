@@ -4,6 +4,7 @@ import httpx
 from fastapi import status, HTTPException
 from .conftest import TestUser, Role
 from ..main import app
+from ..db.db_conn import get_async_session
 from ..routers.product import get_curr_user, Product, Cat
 
 
@@ -34,13 +35,22 @@ class TestCreateReview:
         assert result.status_code == status.HTTP_401_UNAUTHORIZED
 
     async def test_purchase_prod(self, test_client: httpx.AsyncClient, product: Product): 
+        app.dependency_overrides[get_curr_user] = TestUser(Role.CUSTOMER).get_fake_user
         payload = {"content": "Tested and trusted", "rating": 5.0,  'product_id': product.id   }
         result = await test_client.post(self.url, json=payload)
         assert result.status_code == status.HTTP_400_BAD_REQUEST
     
     async def test_invalid_fields(self, test_client: httpx.AsyncClient, product: Product): 
+        app.dependency_overrides[get_curr_user] = TestUser(Role.CUSTOMER).get_fake_user
         payload = {"content": "Tested and trusted",  'product_id': product.id   }
         result = await test_client.post(self.url, json=payload)
         assert result.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
     
+    async def test_multiple_reviews(self, test_client: httpx.AsyncClient, product: Product):
+        app.dependency_overrides[get_curr_user] = TestUser(Role.CUSTOMER).get_fake_user 
+        payload = {"content": "Tested and trusted", "rating": 5.0,  'product_id': product.id   }
+        result = await test_client.post(self.url, json=payload)
+        result.status_code == status.HTTP_201_CREATED
+        result2 = await test_client.post(self.url, json=payload) 
+        result2.status_code == status.HTTP_409_CONFLICT
     
