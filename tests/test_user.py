@@ -26,4 +26,11 @@ class Register:
         result = await test_client.post(self.url, json=self.payload.model_dump_json()) 
         result.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
     
+    async def test_multiple_resgistration(self, test_client: httpx.AsyncClient): 
+        result = await test_client.post(self.url, json=self.payload.model_dump_json()) 
+        result .status_code == status.HTTP_201_CREATED
+        
+        result = await test_client.post(self.url, json=self.payload.model_dump_json()) 
+        result .status_code == status.HTTP_409_CONFLICT
+    
     
