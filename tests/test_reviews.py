@@ -76,6 +76,10 @@ async def create_test_review(test_client: httpx.AsyncClient, product: Product):
 class TestGetOneReview: 
     def __init__(self): 
         self.url = '/reviews/'
+    
+    async def test_get_one_invalid(self, test_client: httpx.AsyncClient): 
+        result = await test_client.get(f"{self.url}111")
+        result.status_code == status.HTTP_404_NOT_FOUND
         
     async def test_get_one(self, test_client: httpx.AsyncClient, review: Review): 
         result = await test_client.get(f"{self.url}{review.id}")
@@ -84,10 +88,9 @@ class TestGetOneReview:
 class TestUpdateReview: 
     def __init__(self): 
         self.url = '/reviews/'
-    
+        self.updates = {'rating': 4.5}
+        
     async def test_unauthorized(self, test_client: httpx.AsyncClient, review: Review):
-        updates = {"rating": 4.5}
-        result = await test_client.patch(f"{self.url}{review.id}", json=updates) 
+        result = await test_client.patch(f"{self.url}{review.id}", json=self.updates) 
         assert result.status_code == status.HTTP_401_UNAUTHORIZED
-        
-        
+    
