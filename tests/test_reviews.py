@@ -7,6 +7,7 @@ from ..main import app
 from ..db.db_conn import get_async_session
 from ..db.model import Review
 from ..routers.product import get_curr_user, Product, Cat
+from uuid import uuid4
 
 
 async def create_new_prod(test_client: httpx.AsyncClient, cat: Cat = Cat.SHIRT, name: str = 'Black Hoodie') -> Product: 
@@ -61,9 +62,12 @@ class TestCreateReview:
         result = await test_client.post(self.url, json=payload)
         result.status_code == status.HTTP_201_CREATED
 
+
+user_id = uuid4
+
 @pytest_asyncio.fixture(scope='module')
-async def create_test_review(test_client: httpx.AsyncClient, product: Product): 
-    app.dependency_overrides[get_curr_user] = TestUser(Role.CUSTOMER).get_fake_user 
+async def create_test_review(test_client: httpx.AsyncClient, product: Product) -> Review: 
+    app.dependency_overrides[get_curr_user] = TestUser(Role.CUSTOMER, id: user_id).get_fake_user 
     payload = {"content": "Tested and trusted", "rating": 5.0,  'product_id': product.id   }
     result = await test_client.post('/reviews/', json=payload)  
     assert result.status_code == status.HTTP_201_CREATED
@@ -93,4 +97,11 @@ class TestUpdateReview:
     async def test_unauthorized(self, test_client: httpx.AsyncClient, review: Review):
         result = await test_client.patch(f"{self.url}{review.id}", json=self.updates) 
         assert result.status_code == status.HTTP_401_UNAUTHORIZED
+    
+        
+    async def test_forbidden_user(self, test_client: httpx.AsyncClient, review: Review):
+        app.dependency_overrides[get_curr_user] = TestUser(Role.CUSTOMER).get_fake_user
+        result = await test_client.patch(f"{self.url}{review.id}", json=self.updates) 
+        assert result.status_code == status.HTTP_403_FORBIDDEN
+    
     

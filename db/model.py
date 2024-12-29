@@ -73,7 +73,7 @@ class Review(Base):
     user_id: Mapped[UUID] = mapped_column(ForeignKey('users.id'), index=True)
     user: Mapped['User'] = relationship(back_populates='reviews')
     product: Mapped["Product"] = relationship( back_populates='reviews') 
-    
+
 
 class Order(Base): 
     __tablename__= "orders"
@@ -112,7 +112,6 @@ class OrderItem(Base):
     product_id: Mapped[int] = mapped_column(ForeignKey('products.id')) 
     product: Mapped['Product'] = relationship("Product", lazy='joined') 
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now) 
-
     order_id: Mapped[int] = mapped_column(ForeignKey('orders.id'), index=True)
 
 class CartItem(Base):
