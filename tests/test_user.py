@@ -45,19 +45,27 @@ class Login:
     async def test_non_existing_user(self, test_client: httpx.AsyncClient): 
         self.payload['email'] = 'balogun@gmail.com'
         result = await test_client.post(self.url, json=self.payload) 
-        result.status_code == status.HTTP_401_UNAUTHORIZED
+        assert result.status_code == status.HTTP_401_UNAUTHORIZED
     
     async def test_invalid_credentials(self, test_client: httpx.AsyncClient): 
         self.payload['password'] = 'pass1234'
         result = await test_client.post(self.url, json=self.payload) 
-        result.status_code == status.HTTP_401_UNAUTHORIZED  
+        assert result.status_code == status.HTTP_401_UNAUTHORIZED  
     
     async def test_valid(self, test_client: httpx.AsyncClient): 
         result = await test_client.post(self.url, json=self.payload)
-        result.status_code == status.HTTP_200_OK
+        assert result.status_code == status.HTTP_200_OK
 
 class Me:
     def __init__(self):
-        self.utrl = '/users/me'
+        self.url = '/users/me'
     
+    async def test_unauthenticated(self, test_client: httpx.AsyncClient): 
+        result = await test_client.get(self.url)
+        assert result.status_code == status.HTTP_401_UNAUTHORIZED
+    
+    async def test_valid(self, test_client: httpx.AsyncClient): 
+        app.dependency_overrides[get_curr_user] = TestUser(Role.CUSTOMER).get_fake_user
+        result = await test_client.get(self.url)        
+        assert result.status_code == status.HTTP_200_OK
     
