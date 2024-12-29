@@ -68,7 +68,7 @@ class UserBase(BaseModel):
     email: EmailStr 
     password: str = Field(..., min_length=8) 
     password_confirm: str 
-    shipping_address: str 
+    address: str 
     created_at: datetime = Field(default_factory=datetime.now) 
     class Config: 
         orm_mode=True 
@@ -92,7 +92,7 @@ class UserUpdate(BaseModel):
     email: EmailStr | None = Field(None)
     password: str | None = Field(None, min_length=8) 
     password_confirm: str | None = Field(None)
-    shipping_address: str | None = Field(None)
+    address: str | None = Field(None)
 
 class ReviewBase(BaseModel): 
     content: str 

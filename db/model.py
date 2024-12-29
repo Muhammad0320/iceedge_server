@@ -56,7 +56,7 @@ class User(Base):
     role: Mapped[Role] = mapped_column(Enum(Role), default=Role.CUSTOMER) 
     email: Mapped[str] = mapped_column(String(64), unique=True)  
     password: Mapped[str] = mapped_column(String(255)) 
-    shipping_address: Mapped[ Optional[str]] = mapped_column(Text) 
+    address: Mapped[ Optional[str]] = mapped_column(Text) 
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now) 
     orders: Mapped[Optional[List["Order"]]] = relationship("Order", cascade='all, delete')
     reviews: Mapped[Optional['Review']]  = relationship(back_populates='user')

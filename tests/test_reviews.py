@@ -67,7 +67,7 @@ user_id = uuid4
 
 @pytest_asyncio.fixture(scope='module')
 async def create_test_review(test_client: httpx.AsyncClient, product: Product) -> Review: 
-    app.dependency_overrides[get_curr_user] = TestUser(Role.CUSTOMER, id: user_id).get_fake_user 
+    app.dependency_overrides[get_curr_user] = TestUser(Role.CUSTOMER, id=user_id).get_fake_user 
     payload = {"content": "Tested and trusted", "rating": 5.0,  'product_id': product.id   }
     result = await test_client.post('/reviews/', json=payload)  
     assert result.status_code == status.HTTP_201_CREATED
