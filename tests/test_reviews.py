@@ -63,7 +63,7 @@ class TestCreateReview:
         result.status_code == status.HTTP_201_CREATED
 
 
-user_id = uuid4
+user_id = uuid4()
 
 @pytest_asyncio.fixture(scope='module')
 async def create_test_review(test_client: httpx.AsyncClient, product: Product) -> Review: 

@@ -26,11 +26,13 @@ async def get_fake_user_by_role(role: Role = Role.CUSTOMER):
     return get_fake_user
 
 class TestUser(): 
-    def __init__(self, role: Role = Role.CUSTOMER, id: UUID = uuid4): 
+    def __init__(self, role: Role = Role.CUSTOMER, id: UUID = uuid4(), email: str = 'lisanalgaib@gmail.com'): 
        self.role = role 
+       self.id = id 
+       self.email = email
        
     async def get_fake_user(self, session: AsyncSession = Depends(get_test_session)): 
-        user = User( id=id, firstname="Muhammad", lastname='lastname', role=self.role, email='lisanalgaib@gmail.com', password='password1234')
+        user = User( id=self.id, firstname="Muhammad", lastname='lastname', role=self.role, email=self.email, password='password1234')
         session.add(user) 
         await session.commit() 
         return user 
