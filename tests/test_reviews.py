@@ -109,4 +109,8 @@ class TestUpdateReview:
         result = await test_client.patch(f"{self.url}{review.id}", json={}) 
         assert result.status_code == status.HTTP_400_BAD_REQUEST
     
+    async def test_valid(self, test_client: httpx.AsyncClient, review: Review):
+        app.dependency_overrides[get_curr_user] = TestUser(Role.CUSTOMER, id=uuid4).get_fake_user
+        result = await test_client.patch(f"{self.url}{review.id}", json=self.updates) 
+        assert result.status_code == status.HTTP_200_OK
     
