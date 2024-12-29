@@ -103,6 +103,12 @@ class TestUpdateReview:
         result = await test_client.patch(f"{self.url}{review.id}", json=self.updates) 
         assert result.status_code == status.HTTP_403_FORBIDDEN
     
+    async def test_invalid_id(self, test_client: httpx.AsyncClient, review: Review): 
+        app.dependency_overrides[get_curr_user] = TestUser(Role.CUSTOMER), user_id.get_fake_user
+        result = await test_client.patch(f'{self.url}12345')
+        assert result.status_code == status.HTTP_404_NOT_FOUND
+        
+    
     async def test_invalid_fields(self, test_client: httpx.AsyncClient, review: Review):
         app.dependency_overrides[get_curr_user] = TestUser(Role.CUSTOMER, id=user_id).get_fake_user
         result = await test_client.patch(f"{self.url}{review.id}", json={}) 
@@ -126,3 +132,4 @@ class TestDeleteReview:
         result = await test_client.delete(f"{self.url}{review.id}")
         assert result.status_code == status.HTTP_403_FORBIDDEN
     
+    # async def test_valid
