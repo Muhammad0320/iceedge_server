@@ -55,4 +55,9 @@ class Login:
     async def test_valid(self, test_client: httpx.AsyncClient): 
         result = await test_client.post(self.url, json=self.payload)
         result.status_code == status.HTTP_200_OK
-     
+
+class Me:
+    def __init__(self):
+        self.utrl = '/users/me'
+    
+    
