@@ -45,6 +45,14 @@ class Login:
     async def test_non_existing_user(self, test_client: httpx.AsyncClient): 
         self.payload['email'] = 'balogun@gmail.com'
         result = await test_client.post(self.url, json=self.payload) 
-        result.status_code == status.HTTP_404_NOT_FOUND
+        result.status_code == status.HTTP_401_UNAUTHORIZED
     
+    async def test_invalid_credentials(self, test_client: httpx.AsyncClient): 
+        self.payload['password'] = 'pass1234'
+        result = await test_client.post(self.url, json=self.payload) 
+        result.status_code == status.HTTP_401_UNAUTHORIZED  
     
+    async def test_valid(self, test_client: httpx.AsyncClient): 
+        result = await test_client.post(self.url, json=self.payload)
+        result.status_code == status.HTTP_200_OK
+     
