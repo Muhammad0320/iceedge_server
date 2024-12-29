@@ -97,7 +97,6 @@ class TestUpdateReview:
     async def test_unauthorized(self, test_client: httpx.AsyncClient, review: Review):
         result = await test_client.patch(f"{self.url}{review.id}", json=self.updates) 
         assert result.status_code == status.HTTP_401_UNAUTHORIZED
-    
         
     async def test_forbidden_user(self, test_client: httpx.AsyncClient, review: Review):
         app.dependency_overrides[get_curr_user] = TestUser(Role.CUSTOMER).get_fake_user
@@ -121,4 +120,9 @@ class TestDeleteReview:
     async def test_unauthorized(self, test_client: httpx.AsyncClient, review: Review): 
         result = await test_client.delete(f"{self.url}{review.id}", json=self.updates) 
         assert result.status_code == status.HTTP_401_UNAUTHORIZED
+    
+    async def test_forbidden_user(self, test_client: httpx.AsyncClient, review: Review):
+        app.dependency_overrides[get_curr_user] = TestUser(Role.CUSTOMER).get_fake_user 
+        result = await test_client.delete(f"{self.url}{review.id}")
+        assert result.status_code == status.HTTP_403_FORBIDDEN
     
