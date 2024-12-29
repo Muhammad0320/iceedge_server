@@ -113,4 +113,12 @@ class TestUpdateReview:
         app.dependency_overrides[get_curr_user] = TestUser(Role.CUSTOMER, id=uuid4).get_fake_user
         result = await test_client.patch(f"{self.url}{review.id}", json=self.updates) 
         assert result.status_code == status.HTTP_200_OK
+
+class TestDeleteReview: 
+    def __init__(self): 
+        self.url = '/reviews/'
+    
+    async def test_unauthorized(self, test_client: httpx.AsyncClient, review: Review): 
+        result = await test_client.delete(f"{self.url}{review.id}", json=self.updates) 
+        assert result.status_code == status.HTTP_401_UNAUTHORIZED
     
