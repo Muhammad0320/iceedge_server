@@ -21,3 +21,9 @@ class Register:
         result = await test_client.post(self.url, json=self.payload.model_dump_json(exclude={'email'}))
         result.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
     
+    async def test_different_passwords(self, test_client: httpx.AsyncClient): 
+        self.payload.password_confirm = 'pass12345'
+        result = await test_client.post(self.url, json=self.payload.model_dump_json()) 
+        result.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+    
+    
