@@ -35,7 +35,7 @@ async def get_reviews_by_prod(id: int, session: AsyncSession = Depends(get_async
     return res 
 
 @router.post('/', dependencies=[Depends(get_curr_user)] ,response_model=ReviewRead, status_code=status.HTTP_201_CREATED)
-async def create_post(user: User, new_review: ReviewCreate = Body(...,example=ReviewCreate(content="The best", rating=5.0, product_id=999)), session: AsyncSession = Depends(get_async_session)): 
+async def create_post(user: User, new_review: ReviewCreate = Body(..., example=ReviewCreate(content="The best", rating=5.0, product_id=999)), session: AsyncSession = Depends(get_async_session)): 
     new_review.user_id = user.id 
     product_purchase = await check_if_user_purchase_prod(user.id, new_review.product_id, session) 
     if not product_purchase: 
@@ -51,10 +51,10 @@ async def create_post(user: User, new_review: ReviewCreate = Body(...,example=Re
 @router.get('/{id}', response_model=ReviewRead)
 async def get_review(review: Review = Depends(get_review_or_404)): 
     return review
-  
-  
-@router.patch('/{id}', dependencies=[Depends(get_curr_user), Depends(check_if_mine)])
-async def update_review(id: int = Path(...), updates: ReviewUpdate = Body(example=ReviewUpdate(rating=5.0, content='new rating')), session: AsyncSession = Depends(get_async_session)): 
+
+@router.patch('/{id}', dependencies=[Depends(get_curr_user)])
+async def update_review( user: User, id: int = Path(...) , updates: ReviewUpdate = Body(example=ReviewUpdate(rating=5.0, content='new rating')), session: AsyncSession = Depends(get_async_session)): 
+    await check_if_mine(id, user, session)
     if not updates: 
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='You must at least update a field!')
     q = update(Review).where(Review.id == id).values(**updates.model_dump(exclude_unset=True))
@@ -64,12 +64,12 @@ async def update_review(id: int = Path(...), updates: ReviewUpdate = Body(exampl
         return False 
     return True 
 
-@router.delete('/{id}',  dependencies=[Depends(get_curr_user), Depends(check_if_mine)] , status_code=status.HTTP_204_NO_CONTENT) 
-async def delete_review(id: int = Path(...), session: AsyncSession = Depends(get_async_session)): 
+@router.delete('/{id}',  dependencies=[Depends(get_curr_user)] , status_code=status.HTTP_204_NO_CONTENT) 
+async def delete_review( user: User ,id: int = Path(...), session: AsyncSession = Depends(get_async_session)): 
+    await check_if_mine(id, user, session)
     q = delete(Review).where(Review.id == id) 
     result = await session.execute(q) 
     await session.commit() 
     if result.rowcount == 0: 
         return False 
     return True 
-
