@@ -13,8 +13,8 @@ from uuid import uuid4
 
 class Register: 
     def __init__(self): 
-        self.url: str = '/users/register/'
-        self.payload:  UserCreate = UserCreate(firstname="Muhammad", lastname='lastname', role=Role.CUSTOMER, email='lisanalgaib@gmail.com', password='password1234', password_confirm='password1234', address='G50, Balogun Gambari')
+        self.url = '/users/register/'
+        self.payload = UserCreate(firstname="Muhammad", lastname='lastname', role=Role.CUSTOMER, email='lisanalgaib@gmail.com', password='password1234', password_confirm='password1234', address='G50, Balogun Gambari')
         
     
     async def test_invalid_fields(self, test_client: httpx.AsyncClient): 
@@ -36,4 +36,15 @@ class Register:
     async def test_valid(self, test_client: httpx.AsyncClient): 
         result = await test_client.post(self.url, json=self.payload.model_dump_json()) 
         result .status_code == status.HTTP_201_CREATED
-        
+
+class Login: 
+    def __init__(self): 
+        self.url = '/users/login/'
+        self.payload = {'email': "lisanalgaib@gmail.com", 'password': 'password1234'}
+    
+    async def test_non_existing_user(self, test_client: httpx.AsyncClient): 
+        self.payload['email'] = 'balogun@gmail.com'
+        result = await test_client.post(self.url, json=self.payload) 
+        result.status_code == status.HTTP_404_NOT_FOUND
+    
+    
