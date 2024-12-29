@@ -136,5 +136,9 @@ class TestDeleteReview:
         app.dependency_overrides[get_curr_user] = TestUser(Role.CUSTOMER, user_id).get_fake_user
         result = await test_client.delete(f"{self.url}1234")
         assert result.status_code == status.HTTP_404_NOT_FOUNDl
-    
-    
+
+    async def test_valid(self, test_client: httpx.AsyncClient, review: Review): 
+        app.dependency_overrides[get_curr_user] = TestUser(Role.CUSTOMER, user_id).get_fake_user
+        result = await test_client.delete(f"{self.url}{review.id}")
+        assert result.status_code == status.HTTP_204
+        
