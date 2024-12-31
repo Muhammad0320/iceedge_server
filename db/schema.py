@@ -118,11 +118,10 @@ class ReviewUpdate(BaseModel):
 
 class OrderBase(BaseModel): 
     total: float = Field(..., ge=4999.99) 
-    quantity: int = Field(..., gt=1) 
     shipping_fee: float 
     shipping_address: str 
     created_at: datetime = Field(default_factory=datetime.now) 
-    customer_id: int 
+    customer_id: UUID | None = None 
     order_status: OrderStatus = Field(OrderStatus.PENDING)  
     order_items: list["ItemRead"]
     class Config:
@@ -133,8 +132,9 @@ class OrderCreate(OrderBase):
 
 class OrderRead(OrderBase): 
     id: int 
+    customer_id: UUID | None = None 
 
-class OrderUpdate(BaseModel): 
+class OrderUpdate(BaseModel):
     total: float | None = Field(None, ge=4999.99) 
     quantity: int | None = Field(None, gt=1) 
     shipping_fee: float | None = Field(None)

@@ -41,12 +41,15 @@ async def get_user_orders_or_404(id: UUID, session: AsyncSession = Depends(get_a
 #     return item
 
 @router.post('/', status_code=status.HTTP_201_CREATED)
-async def create_new_order(new_item: OrderCreate, session: AsyncSession = Depends(get_async_session) ): 
-    order = Order(**new_item.model_dump(exclude_unset=True))
+async def create_new_order( user: User, new_item: OrderCreate, session: AsyncSession = Depends(get_async_session) ): 
+    if not new_item.customer_id: 
+        new_item.customer_id = user.id
+    order = Order({**new_item.model_dump(exclude_unset=True)})
     session.add(order) 
     await session.commit()
-    return 
-    
+    return order
+
+
 # TODO: Only Admins and Developer
 @router.get('/', dependencies=[ Depends(Rbac(role=[Role.DEVELOPER, Role.MERCHANT]).accessible_to)], response_model=list[OrderItem])
 async def get_all_items(session: AsyncSession = Depends(get_async_session)): 
