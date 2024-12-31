@@ -160,6 +160,7 @@ class ItemBase(BaseModel):
     total: float = Field(..., ge=4999.99) 
     quantity: int = Field(..., gt=1) 
     product_id: int 
+    unit_price: float
     class Config:
         orm_mode=True 
 
