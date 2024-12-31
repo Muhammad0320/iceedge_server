@@ -25,7 +25,7 @@ async def create_new_prod(test_client: httpx.AsyncClient, cat: Cat = Cat.SHIRT, 
 @pytest_asyncio.fixture(scope='module', autouse=True)
 async def create_test_product(test_client: httpx.AsyncClient): 
     return (await create_new_prod(test_client))
-    
+
     
 class TestCreateReview: 
     def __init__(self): 
@@ -115,7 +115,7 @@ class TestUpdateReview:
         assert result.status_code == status.HTTP_400_BAD_REQUEST
     
     async def test_valid(self, test_client: httpx.AsyncClient, review: Review):
-        app.dependency_overrides[get_curr_user] = TestUser(Role.CUSTOMER, id=uuid4).get_fake_user
+        app.dependency_overrides[get_curr_user] = TestUser(Role.CUSTOMER, id=uuid4()).get_fake_user
         result = await test_client.patch(f"{self.url}{review.id}", json=self.updates) 
         assert result.status_code == status.HTTP_200_OK
 
@@ -124,7 +124,7 @@ class TestDeleteReview:
         self.url = '/reviews/'
     
     async def test_unauthorized(self, test_client: httpx.AsyncClient, review: Review): 
-        result = await test_client.delete(f"{self.url}{review.id}", json=self.updates) 
+        result = await test_client.delete(f"{self.url}{review.id}")  
         assert result.status_code == status.HTTP_401_UNAUTHORIZED
     
     async def test_forbidden_user(self, test_client: httpx.AsyncClient, review: Review):
