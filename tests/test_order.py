@@ -28,3 +28,13 @@ class TestGetOrders:
         result = await test_client.get(self.url) 
         assert result.status_code == status.HTTP_200_OK
 
+
+class TestGetOneOrder:
+    def __init__(self):
+        self.url = '/orders/'
+    
+    async def get_unauthorized(self, test_client: httpx.AsyncClient): 
+        result = await test_client.get(self.url)
+        assert result.status_code == status.HTTP_401_UNAUTHORIZED
+    
+    
