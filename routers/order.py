@@ -4,7 +4,7 @@ from ..db.model import  Product, OrderItem, User, Order
 from sqlalchemy import select, update, delete 
 from sqlalchemy.orm import joinedload
 from ..dependencies import get_curr_user, Rbac
-from ..db.schema import Role, OrderRead
+from ..db.schema import Role, OrderRead, OrderCreate
 from uuid import UUID
 # from .product import get_product_or_404
 
@@ -40,7 +40,13 @@ async def get_user_orders_or_404(id: UUID, session: AsyncSession = Depends(get_a
 # async def get_item_by_id(item: OrderItem = Depends(get_item_or_404), session: AsyncSession = Depends(get_async_session)):
 #     return item
 
-
+@router.post('/', status_code=status.HTTP_201_CREATED)
+async def create_new_order(new_item: OrderCreate, session: AsyncSession = Depends(get_async_session) ): 
+    order = Order(**new_item.model_dump(exclude_unset=True))
+    session.add(order) 
+    await session.commit()
+    return 
+    
 # TODO: Only Admins and Developer
 @router.get('/', dependencies=[ Depends(Rbac(role=[Role.DEVELOPER, Role.MERCHANT]).accessible_to)], response_model=list[OrderItem])
 async def get_all_items(session: AsyncSession = Depends(get_async_session)): 
