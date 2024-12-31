@@ -75,4 +75,8 @@ class TestGetMyOrder:
         result = await test_client.get(self.url)
         assert result.status_code == status.HTTP_403_FORBIDDEN
     
-    
+    async def test_valid(self, test_client: httpx.AsyncClient, order: Order): 
+        app.dependency_overrides[get_curr_user] = TestUser(Role.CUSTOMER).get_fake_user
+        result = await test_client.get(self.url) 
+        assert result.status_code == status.HTTP_200_OK
+        
