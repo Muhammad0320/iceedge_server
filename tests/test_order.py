@@ -70,4 +70,9 @@ class TestGetMyOrder:
         result = await test_client.get(self.url)
         assert result.status_code ==status.HTTP_401_UNAUTHORIZED
     
+    async def test_not_found(self, test_client: httpx.AsyncClient): 
+        app.dependency_overrides[get_curr_user] = TestUser(Role.CUSTOMER).get_fake_user
+        result = await test_client.get(self.url)
+        assert result.status_code == status.HTTP_403_FORBIDDEN
+    
     
