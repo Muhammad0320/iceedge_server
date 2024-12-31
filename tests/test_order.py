@@ -10,7 +10,7 @@ from ..db.schema import UserCreate, UserUpdate, OrderCreate, OrderRead
 from ..routers.product import get_curr_user, Product, Cat
 from uuid import uuid4
 
-class TestGetOneOrder: 
+class TestGetOrders: 
     def __init__(self): 
         self.url = '/orders/'
 
@@ -23,4 +23,8 @@ class TestGetOneOrder:
         result = await test_client.get(self.url) 
         assert result.status_code == status.HTTP_403_FORBIDDEN
     
-    
+    async def test_valid(self, test_client: httpx.AsyncClient): 
+        app.dependency_overrides[get_curr_user] = TestUser(Role.DEVELOPER).get_fake_user
+        result = await test_client.get(self.url) 
+        assert result.status_code == status.HTTP_200_OK
+
