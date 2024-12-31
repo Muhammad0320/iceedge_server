@@ -66,4 +66,8 @@ class TestGetMyOrder:
     def __init__(self): 
         self.url = '/orders/my_orders'
     
+    async def test_unauthorized(self, test_client: httpx.AsyncClient): 
+        result = await test_client.get(self.url)
+        assert result.status_code ==status.HTTP_401_UNAUTHORIZED
+    
     
