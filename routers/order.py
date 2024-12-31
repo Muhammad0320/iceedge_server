@@ -44,7 +44,7 @@ async def get_user_orders_or_404(id: UUID, session: AsyncSession = Depends(get_a
 async def create_new_order( user: User, new_item: OrderCreate, session: AsyncSession = Depends(get_async_session) ): 
     if not new_item.customer_id: 
         new_item.customer_id = user.id
-    order = Order({**new_item.model_dump(exclude_unset=True)})
+    order = Order(**new_item.model_dump(exclude_unset=True))
     session.add(order) 
     await session.commit()
     return order

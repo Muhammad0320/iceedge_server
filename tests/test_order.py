@@ -61,4 +61,9 @@ class TestGetOneOrder:
         result = await test_client.get(f"{self.url}{order.id}")
         assert result.status_code == status.HTTP_200_OK
     
+
+class TestGetMyOrder: 
+    def __init__(self): 
+        self.url = '/orders/my_orders'
+    
     
